@@ -1,0 +1,21 @@
+export const Constants =  {
+  LANGUAGE: 'lang',
+  VI: 'vi',
+  EN: 'en',
+  TOKEN: 'token',
+  USER_ID: 'userId',
+  DEFAULT: 'default',
+  NEW_PRODUCT: 'newProduct',
+  LOW_PRICE: 'lowPrice',
+  HIGHT_PRICE: 'hightPrice',
+  MAX_IMAGES_UPLOAD: 6,
+  MAX_PROMOTION_SHOW: 1,
+  TOKEN_FACEBOOK: 'tokenFacebook',
+  ORDER_CREATED: 'ORDER_CREATED',
+  ORDER_COMPLETED: 'ORDER_COMPLETED',
+  ORDER_CANCELLED: 'ORDER_CANCELLED',
+  ORDER_CONFIRM: 'ORDER_CONFIRM',
+  ORDER_SENT: 'ORDER_SENT',
+  ORDER_RETURN: 'ORDER_RETURN',
+  ORDER_APPROVED: 'ORDER_APPROVED'
+}

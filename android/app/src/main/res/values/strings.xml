@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FiboCart</string>
+    <string name="facebook_app_id">706964503234072</string> 
+    <string name="fb_login_protocol_scheme">fb706964503234072</string>
+</resources>

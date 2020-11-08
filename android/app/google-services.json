@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "794920347592",
+    "firebase_url": "https://livecart-dd7db.firebaseio.com",
+    "project_id": "livecart-dd7db",
+    "storage_bucket": "livecart-dd7db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:794920347592:android:ef79542a0192b6c2ba42fd",
+        "android_client_info": {
+          "package_name": "com.fibocart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "794920347592-3vmvr773c9tf15jiacihktv3ip7l853a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPteMj7PIdLhlv7jVbLDx7Iogpo_e7RYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "794920347592-3vmvr773c9tf15jiacihktv3ip7l853a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

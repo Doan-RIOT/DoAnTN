@@ -17,7 +17,7 @@ import { CardsTypes } from '../Stores/Card/Actions';
 import { fetchCards } from './CardsSaga';
 
 import { ProcessTypes } from '../Stores/Process/Actions';
-import { fetchProcess } from './ProcessSaga';
+import { fetchProcess, fetchProcessDetail } from './ProcessSaga';
 
 export default function* root() {
   yield all([
@@ -39,6 +39,7 @@ export default function* root() {
     takeLatest(CategoriesTypes.FETCH_PRODUCTS_BY_CATEGORY, fetchProductsByCategory),
     takeLatest(CategoriesTypes.FETCH_PARENT_CATEGORY, fetchParentCategory),
     takeLatest(CardsTypes.FETCH_CARDS, fetchCards),
-    takeLatest(ProcessTypes.FETCH_PROCESS, fetchProcess)
+    takeLatest(ProcessTypes.FETCH_PROCESS, fetchProcess),
+    takeLatest(ProcessTypes.FETCH_PROCESS_DETAIL, fetchProcessDetail)
   ])
 }

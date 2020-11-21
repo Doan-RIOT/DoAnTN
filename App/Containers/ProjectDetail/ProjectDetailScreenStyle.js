@@ -27,10 +27,10 @@ export default StyleSheet.create({
         width: null,
     },
     buttonImplement: {
-        height:60,
-        width:60,
-        justifyContent:"center",
-        alignItems:"center",
+        height: 60,
+        width: 60,
+        justifyContent: "center",
+        alignItems: "center",
         position: 'absolute',
         backgroundColor: "#21BA45",
         marginTop: height * 4 / 5,
@@ -58,12 +58,6 @@ export default StyleSheet.create({
         left: 0,
         right: 0,
         width: null,
-    },
-    video: {
-        backgroundColor: Colors.white,
-        marginTop: height / 15,
-        borderRadius: 10,
-        height: 200
     },
     slidePhase: {
         position: "absolute",

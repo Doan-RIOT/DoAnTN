@@ -8,7 +8,7 @@ export default StyleSheet.create({
         paddingHorizontal: 20,
     },
     header: {
-        backgroundColor: "#0A9F9E",
+        backgroundColor: Colors.green,
         height: 60,
         position: 'absolute',
         top: 0,
@@ -25,6 +25,7 @@ export default StyleSheet.create({
         alignItems: "center",
     },
     input: {
+        fontSize:20,
         borderRadius: 10,
         borderWidth: 1,
         borderColor: "#D6D6D6",
@@ -34,15 +35,20 @@ export default StyleSheet.create({
     },
     location: {
         height: height / 3,
-        backgroundColor: "#0A9F9E",
-        marginTop: 10
+        backgroundColor: Colors.white,
+        marginTop: 10,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: "#D6D6D6",
     },
     requestSystem: {
         backgroundColor: Colors.white,
         paddingHorizontal: 10,
         paddingVertical: 10,
         borderRadius: 10,
-        marginTop: 10
+        marginTop: 10,
+        borderWidth: 1,
+        borderColor:"#D9D9D9"
     },
     itemRequestSystem: {
         justifyContent: 'space-between',
@@ -86,5 +92,29 @@ export default StyleSheet.create({
     lineSummary: {
         borderColor: "#707070",
         borderWidth: 0.5,
+    },
+    map: {
+        ...StyleSheet.absoluteFillObject,
+      },
+      buttonImplement1: {
+        height:60,
+        width:60,
+        justifyContent:"center",
+        alignItems:"center",
+        position: 'absolute',
+        backgroundColor: "#21BA45",
+        marginTop: height * 4 / 5,
+        marginRight: 20,
+        marginLeft: width * 4 / 5,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 30,
+        shadowColor: "#00000059",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.25,
+        elevation: 6,
     },
 })

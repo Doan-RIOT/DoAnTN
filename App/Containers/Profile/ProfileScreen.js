@@ -6,7 +6,7 @@ import Toast, { DURATION } from 'react-native-easy-toast';
 import { Image, TouchableOpacity, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {
-  Button, Block,Text, BaseModal,
+  Button, Block, Text, BaseModal,
   Card, Header, Loading, CheckBox, Cart,
 } from "../../Components";
 import UserActions from '../../Stores/User/Actions';
@@ -18,6 +18,7 @@ import { Config } from '../../Config/index';
 import { Screens } from '../../Utils/screens';
 import { Constants } from '../../Utils/constants';
 import { ScrollView } from "react-native-gesture-handler";
+import { ImageBackground } from "react-native";
 
 class ProfileScreen extends Component {
   constructor(props) {
@@ -25,27 +26,22 @@ class ProfileScreen extends Component {
     this.state = {
       errorCode: '',
       profile: {},
+      token: ''
     }
   }
 
-  static getDerivedStateFromProps(nextProps, prevState){
+  static getDerivedStateFromProps(nextProps, prevState) {
     const { errorCode } = nextProps;
     let data = { errorCode };
     return data;
   }
 
-  componentDidMount = () => {
-    this.didFocusListener = this.props.navigation.addListener(
-      'didFocus',
-      () => {
-        const { profile } = this.props;
-        if (profile) {
-          this.setState({
-            profile,
-          })
-        }
-      }
-    );
+  componentDidMount = async () => {
+    const token = await getToken();
+    this.setState({
+      token
+    })
+    console.log("tokenprofile", this.state.token)
   };
 
   componentWillUnmount = () => {
@@ -57,51 +53,55 @@ class ProfileScreen extends Component {
     const { navigation, userId } = this.props;
     const imageUrl = `${Config.IMAGE_URL}?uploadId=${profile.avatar ? profile.avatar : ''}&seq=1`;
     return (
-      <TouchableOpacity
-        onPress={() => this.handleNavigateUserInfo()}
-        disabled={!userId || userId && userId === ''}
-      >
-        <Block flex={false} center row style={Style.container}>
-          <Image 
-            source={profile.avatar ? { uri:  imageUrl} : Images.avatar}  
-            style={Style.avatar} 
-          />
-          <Block style={{marginLeft: 10}}>
-            {userId && userId !== '' ? (
-              <Block flex={false}>
-                {profile && (profile.lastName || profile.email || profile.phone) ? (
-                  <>
-                    <Text h3>
-                      {`${profile && profile.lastName ? profile.lastName : ''} ${profile && profile.firstName ? profile.firstName : ''}`}
-                    </Text>
-                    {profile && profile.email ? (
-                      <Text h3>{profile.email}</Text>
-                    ): null}
-                    {profile && profile.phone ?(
-                      <Text h3>{profile.phone}</Text>
-                    ): null}
-                  </>
-                ): (
-                  <Text>{strings('Profile.msgUpdateProfile')}</Text>
+      <ImageBackground
+        source={Images.farmImage} style={{ flex: 1, justifyContent: "center" }} imageStyle={{ resizeMode: "stretch" }}>
+        <TouchableOpacity
+          style={{ opacity: 0.8 }}
+          onPress={() => this.handleNavigateUserInfo()}
+          disabled={!userId || userId && userId === ''}
+        >
+          <Block flex={false} center row style={Style.container}>
+            <Image
+              source={profile.avatar ? { uri: imageUrl } : Images.avatar}
+              style={Style.avatar}
+            />
+            <Block style={{ marginLeft: 10 }}>
+              {userId && userId !== '' ? (
+                <Block flex={false}>
+                  {profile && (profile.lastName || profile.email || profile.phone) ? (
+                    <>
+                      <Text h3>
+                        {`${profile && profile.lastName ? profile.lastName : ''} ${profile && profile.firstName ? profile.firstName : ''}`}
+                      </Text>
+                      {profile && profile.email ? (
+                        <Text h3>{profile.email}</Text>
+                      ) : null}
+                      {profile && profile.phone ? (
+                        <Text h3>{profile.phone}</Text>
+                      ) : null}
+                    </>
+                  ) : (
+                      <Text>{strings('Profile.msgUpdateProfile')}</Text>
+                    )}
+                </Block>
+              ) : (
+                  <Block row center>
+                    <TouchableOpacity onPress={() => navigation.navigate(Screens.LOGIN)}>
+                      <Text green h3>{strings('Login.login')}</Text>
+                    </TouchableOpacity>
+                    <Text h3 green>/</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate(Screens.SIGNUP)}>
+                      <Text green h3>{strings('Login.signUp')}</Text>
+                    </TouchableOpacity>
+                  </Block>
                 )}
-              </Block>
-            ) : (
-              <Block row center>
-                <TouchableOpacity onPress={() => navigation.navigate(Screens.LOGIN)}>
-                  <Text green h3>{strings('Login.login')}</Text>
-                </TouchableOpacity>
-                <Text h3 green>/</Text>
-                <TouchableOpacity onPress={() => navigation.navigate(Screens.SIGNUP)}>
-                  <Text green h3>{strings('Login.signUp')}</Text>
-                </TouchableOpacity>
-              </Block>
-            )}
+            </Block>
           </Block>
-        </Block>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </ImageBackground>
     );
   };
-  
+
   renderContent = () => {
     const { navigation } = this.props;
     return (
@@ -133,7 +133,7 @@ class ProfileScreen extends Component {
   handleNavigateUserInfo = () => {
     const { navigation } = this.props;
     const { profile } = this.state;
-    const data  = JSON.parse(JSON.stringify(profile));
+    const data = JSON.parse(JSON.stringify(profile));
     navigation.navigate(Screens.USER_INFO, data)
   };
 
@@ -148,16 +148,17 @@ class ProfileScreen extends Component {
 
     return (
       <Block style={Style.view}>
-        <Header
+        {/* <Header
           title={strings('Profile.headerTitle')}
-          rightIcon={<Cart navigation={navigation} />}
-        />
+        // rightIcon={<Cart navigation={navigation} />}
+        /> */}
         {this.renderInfo()}
-        <ScrollView>
+        {/* <ScrollView>
           {Object.entries(profile).length !== 0 ? (
           this.renderContent()
           ) : null}
-        </ScrollView>
+        </ScrollView> */}
+
         {/* <Block flex={false} row style={Style.associate}>
           <TouchableOpacity
             onPress={() => Linking.openURL('https://www.facebook.com/')}

@@ -15,7 +15,9 @@ export default StyleSheet.create({
     borderRadius: 0,
     borderWidth: 0,
     borderBottomColor: Colors.gray2,
-    borderBottomWidth: StyleSheet.hairlineWidth
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    fontSize: 20,
+    color:"white"
   },
   hasErrors: {
     borderBottomColor: Colors.error

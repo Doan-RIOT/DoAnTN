@@ -37,4 +37,12 @@ export default {
   iconTodoList: require('../Assets/images/IconTodoList.png'),
   iconNotifications: require('../Assets/images/notificationsIcon.png'),
   iconProcess: require('../Assets/images/iconProcess.png'),
+  farmImage: require('../Assets/images/farmImage.jpg'),
+  slide1: require('../Assets/images/slide1.jpg'),
+  slide2: require('../Assets/images/slide2.jpg'),
+  farmMarket: require('../Assets/images/farmMarket.png'),
+  iconAwesomeCamera: require('../Assets/images/IconAwesomeCamera.png'),
+  invest: require('../Assets/images/invest.png'),
+  profit: require('../Assets/images/profit.png'),
+  quantity: require('../Assets/images/quantity.png'),
 }

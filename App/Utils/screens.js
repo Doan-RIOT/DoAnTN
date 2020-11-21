@@ -32,5 +32,8 @@ export const Screens =  {
   PRODUCT_DESCRIPTION: 'ProductDescriptionScreen',
   REASON_RETURN_ORDER: 'ReasonReturnOrderScreen',
   PROCESS_DETAIL: 'ProcessDetailScreen',
-  PROCESS_IMPLEMENT : 'ProcessImplementScreen'
+  PROCESS_IMPLEMENT : 'ProcessImplementScreen',
+  PROJECT: 'ProjectScreen',
+  TASK:'TaskDetailScreen',
+  TASK_PROJECT:'TaskProjectDetailScreen'
 }

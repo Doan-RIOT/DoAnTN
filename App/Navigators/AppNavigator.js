@@ -1,10 +1,11 @@
 import React from 'react';
+import { Image } from 'react-native'
 import { createAppContainer, createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Badge } from 'react-native-paper';
 import { strings } from '../Locate/I18n';
 import { Sizes, Colors, Images } from '../Theme';
-import { Block , IconFavorites} from '../Components';
+import { Block, IconFavorites } from '../Components';
 import { Screens } from '../Utils/screens';
 import HomeScreenFarm from '../Containers/HomeFarm/HomeScreenFarm';
 import BranchScreen from '../Containers/Home/BranchScreen';
@@ -16,7 +17,7 @@ import DetailOrderScreen from '../Containers/Profile/DetailOrderScreen';
 import UserInfoScreen from '../Containers/Profile/UserInfoScreen';
 import AddressScreen from '../Containers/Profile/AddressScreen';
 import AddEditAddressScreen from '../Containers/Profile/AddEditAddressScreen';
-import LoginScreen  from '../Containers/Login/LoginScreen';
+import LoginScreen from '../Containers/Login/LoginScreen';
 import ProductDetailScreen from '../Containers/ProductDetail/ProductDetailScreen';
 import ImageCommentsScreen from '../Containers/ProductDetail/ImageCommentsScreen';
 import ImageZoomScreen from '../Containers/ProductDetail/ImageZoomScreen';
@@ -39,6 +40,9 @@ import ProductDescriptionScreen from '../Containers/ProductDetail/ProductDescrip
 import ReasonReturnOrderScreen from '../Containers/Profile/ReasonReturnOrderScreen';
 import ProcessDetailScreen from '../Containers/ProcessDetail/ProcessDetailScreen';
 import ProcessImplementScreen from '../Containers/ProcessDetail/ProcessImplementScreen';
+import TaskDetailScreen from '../Containers/ProcessDetail/TaskDetailScreen';
+import ProjectDetailScreen from '../Containers/ProjectDetail/ProjectDetailScreen';
+import TaskProjectDetailScreen from '../Containers/ProjectDetail/TaskProjectDetailScreen';
 /**
  * The root screen contains the application's navigation.
  *
@@ -122,29 +126,36 @@ const bottomTabNavigator = createBottomTabNavigator({
       title: strings('Home.home'),
     },
   },
-  [Screens.CATEGORIES]: {
-    screen: CategoriesStackNavigator,
-    navigationOptions: {
-      title: strings('Categories.categories'),
-    },
-  },
+  // [Screens.CATEGORIES]: {
+  //   screen: CategoriesStackNavigator,
+  //   navigationOptions: {
+  //     title: strings('Categories.categories'),
+  //   },
+  // },
   [Screens.CARD]: {
     screen: CardStackNavigator,
     navigationOptions: {
-      title: strings('Card.card'),
-    },
-  },
-  [Screens.FAVORITES]: {
-    screen: FavoritesStackNavigator,
-    navigationOptions: {
-      title: strings('Favorites.favorites'),
+      title: strings('Project.project'),
       tabBarIcon: ({ focused, horizontal, tintColor }) => {
         return (
-          <IconFavorites color={tintColor} />
+          <Block flex={false}>
+            <Image source={Images.farmMarket} style={{ tintColor }} />
+          </Block>
         );
       }
     },
   },
+  // [Screens.FAVORITES]: {
+  //   screen: FavoritesStackNavigator,
+  //   navigationOptions: {
+  //     title: strings('Favorites.favorites'),
+  //     tabBarIcon: ({ focused, horizontal, tintColor }) => {
+  //       return (
+  //         <IconFavorites color={tintColor} />
+  //       );
+  //     }
+  //   },
+  // },
   [Screens.PROFILE]: {
     screen: ProfileStackNavigator,
     navigationOptions: {
@@ -153,15 +164,15 @@ const bottomTabNavigator = createBottomTabNavigator({
         return (
           <Block flex={false}>
             <Icon name='user' size={22} color={tintColor} />
-            <Badge
+            {/* <Badge
               style={{ position: 'absolute', top: -4, left: 9 }}
-            >0</Badge>
+            >0</Badge> */}
           </Block>
         );
       }
     },
   },
-  }, {
+}, {
   defaultNavigationOptions: ({ navigation }) => ({
     tabBarIcon: ({ focused, horizontal, tintColor }) => {
       const { routeName } = navigation.state;
@@ -193,7 +204,10 @@ const rootStackNavigator = createStackNavigator(
     [Screens.ACTIVE]: ActiveScreen,
     [Screens.PRODUCT_DETAIL]: ProductDetailScreen,
     [Screens.PROCESS_DETAIL]: ProcessDetailScreen,
-    [Screens.PROCESS_IMPLEMENT] : ProcessImplementScreen,
+    [Screens.PROCESS_IMPLEMENT]: ProcessImplementScreen,
+    [Screens.TASK]: TaskDetailScreen,
+    [Screens.PROJECT]: ProjectDetailScreen,
+    [Screens.TASK_PROJECT]:TaskProjectDetailScreen,
     [Screens.IMAGE_COMMENTS]: ImageCommentsScreen,
     [Screens.IMAGE_ZOOM]: ImageZoomScreen,
     [Screens.IMAGE_PRODUCT_ZOOM]: ImageProductZoomScreen,

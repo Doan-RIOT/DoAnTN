@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated,Dimensions } from 'react-native';
+import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated, Dimensions, } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Sizes, Colors, ApplicationStyles, Images } from '../../Theme';
 import { Screens } from '../../Utils/screens';
@@ -8,26 +8,35 @@ import {
   Card, Header, Input, Picker, Loading, Text,
 } from "../../Components";
 import { Title } from 'react-native-paper';
-import styles from './ProcessDetailScreenStyle'
+import styles from './ProjectDetailScreenStyle'
 import { strings } from '../../Locate/I18n';
 import { BarChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
-import * as scale from 'd3-scale';
+import * as scale from 'd3-scale'
 import Carousel from 'react-native-snap-carousel';
+//redux
+import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
+import PropTypes, { number, string } from 'prop-types';
+import ProcessActions from '../../Stores/Process/Actions';
 const { width } = Dimensions.get('window');
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const widthCarousel = width - (ApplicationStyles.marginHorizontal.marginHorizontal * 2);
-class ProcessDetailScreen extends Component {
+class ProjectDetailScreen extends Component {
   constructor(props) {
     super(props)
     this.state = {
       Index: 0,
       scrollY: new Animated.Value(0),
+      ProcessDetail: [],
       carousel: [{ url: Images.slide1 }, { url: Images.slide2 }],
     }
   }
   componentDidMount() {
-
+    // const { processActions, processDetail } = this.props
+    // processActions.fetchProcessDetail();
+    // this.setState({ ProcessDetail: processDetail.Supply })
+    // console.log(processDetail)
   }
   renderItemCarousel = ({ item, index }) => {
     return (
@@ -55,7 +64,7 @@ class ProcessDetailScreen extends Component {
     );
   };
   renderSlidePhase = () => {
-    const summary = ["Thống kê", "Dự toán", "Bộ tiêu chí",];
+    const summary = ["Thống kê", "Dự toán", "Điều kiện",];
     const process = ["Giai đoạn 1", "Giai đoạn 2", "Giai đoạn 3", "Giai đoạn 4", "Giai đoạn 5",];
     const summaryProcess = summary.concat(process);
     summaryProcess.push("Kết thúc")
@@ -92,7 +101,7 @@ class ProcessDetailScreen extends Component {
   }
   renderItemQuestion = (item) => {
     return (
-      <Block flex={false} style={{ paddingHorizontal: 17, backgroundColor: "#E7F8FD", borderRadius: 10, paddingVertical: 10, marginBottom: 10 }}>
+      <Block key={item.id} flex={false} style={{ paddingHorizontal: 17, backgroundColor: "#E7F8FD", borderRadius: 10, paddingVertical: 10, marginBottom: 10 }}>
         <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
         <Text h3 color={Colors.catalinaBlue} >{item.content}</Text>
         <Block flex={false} style={styles.line}></Block>
@@ -160,9 +169,9 @@ class ProcessDetailScreen extends Component {
   }
   renderQuestions = () => {
     const listQuestion = [
-      { "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" },
-      { "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" },
-      { "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" }
+      { "id": 1, "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" },
+      { "id": 2, "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" },
+      { "id": 3, "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" }
     ]
     return (
       <Block>
@@ -255,7 +264,7 @@ class ProcessDetailScreen extends Component {
   }
   renderItemEstimatesCostPhase = (data) => {
     return (
-      <Block flex={false} >
+      <Block key={data.id} flex={false} >
         {data.map((item) =>
           <Block center flex={false} style={styles.ItemEstimatesPhase}>
             <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
@@ -329,7 +338,7 @@ class ProcessDetailScreen extends Component {
           <Block center flex={false} row style={{ marginBottom: 10 }} >
             <Block flex={false} style={styles.dot} />
             <TouchableOpacity style={styles.task}
-             onPress={() => navigation.navigate(Screens.TASK)}
+              onPress={() => navigation.navigate(Screens.TASK_PROJECT)}
             >
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
               <Text h4 color={Colors.catalinaBlue}>{item.estimatesTime} Ngày</Text>
@@ -358,7 +367,7 @@ class ProcessDetailScreen extends Component {
             <Block flex={false} style={{ backgroundColor: "#ffffff", alignItems: 'center', justifyContent: 'center', }}>
               <Image source={Images.iconMaterialMoney} style={{ resizeMode: "stretch", marginRight: 10 }}></Image>
             </Block>
-            <Text h3 bold color={"#26C165"}>{strings('Process.cost')}</Text>
+            <Text h3 bold color={"#26C165"}>Nguyên liệu cần chuẩn bị</Text>
           </Block>
           <Block flex={false} >
             {this.renderItemEstimatesCostPhase(dataEstimatesProcess)}
@@ -463,15 +472,22 @@ class ProcessDetailScreen extends Component {
           >
           </Header>
         </Animated.View>
-        <TouchableOpacity style={styles.buttonImplement}
+        {/* <TouchableOpacity style={styles.buttonImplement}
           onPress={() => navigation.navigate(Screens.PROCESS_IMPLEMENT)}
         >
           <Text h3 bold color={Colors.white}>Triển</Text>
           <Text h3 bold color={Colors.white}>khai</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </Block>
 
     )
   }
 }
-export default ProcessDetailScreen;
+const mapStateToprop = (state) => ({
+  processDetail: state.process.processDetail
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  processActions: bindActionCreators(ProcessActions, dispatch),
+})
+export default connect(mapStateToprop, mapDispatchToProps)(ProjectDetailScreen);

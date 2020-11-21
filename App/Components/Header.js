@@ -33,7 +33,7 @@ export default class Header extends Component {
       userId
     } = this.props;
     return (
-      <Block flex={false} row center style={[styles.header, style]}>
+      <Block flex={false} color={"#BEF4A3"}  row center style={[styles.header, style]}>
         <Block flex={false} style={{ width: '10%' }}>
           {isShowBack && (
             <TouchableOpacity onPress={() => this.handleGoBack()}>
@@ -58,8 +58,6 @@ export default class Header extends Component {
         <Block flex={false} style={styles.headerRight}>
           {rightIcon}
         </Block>
-       
-        
       </Block>
     );
   }

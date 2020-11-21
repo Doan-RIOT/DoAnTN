@@ -62,8 +62,10 @@ async function post(url, data, isNeedToken, isPostForm) {
     }
     const response = await axiosDefault.post(url, data);
     if (in200s(response.status)) {
+      console.log("data1",response.data)
       return response.data
     }
+    console.log("data2",response)
     return response;
   } catch (error) {
     return { status: 500, success: false, message:'Error' };

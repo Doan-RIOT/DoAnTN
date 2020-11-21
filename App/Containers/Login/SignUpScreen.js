@@ -105,7 +105,7 @@ class SignUpScreen extends Component {
     const hasErrors = (key) => (errors.includes(key) ? Style.hasErrors : null)
 
     return (
-        <ImageBackground source={Images.backgroundLogin} style={Style.image}>
+        <ImageBackground source={Images.farmImage} style={Style.image}>
           <Header 
             title={strings('Login.signUp')}
             isShowBack
@@ -121,6 +121,7 @@ class SignUpScreen extends Component {
                 value={this.state.username}
                 onChangeText={(text) => this.setState({ username: text })}
                 number
+                labelColor ='white'
               />
               <Input
                 secure
@@ -129,6 +130,7 @@ class SignUpScreen extends Component {
                 style={[Style.input, hasErrors('password')]}
                 value={this.state.password}
                 onChangeText={(text) => this.setState({ password: text })}
+                labelColor ='white'
               />
               <Input
                 secure
@@ -137,6 +139,7 @@ class SignUpScreen extends Component {
                 style={[Style.input, hasErrors('passwordConfirm')]}
                 value={this.state.passwordConfirm}
                 onChangeText={(text) => this.setState({ passwordConfirm: text })}
+                labelColor ='white'
               />
               {/* <Block flex={false} row>
                 <Radio

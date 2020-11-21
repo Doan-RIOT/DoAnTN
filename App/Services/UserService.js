@@ -1,7 +1,8 @@
 import { Api } from './Api';
+import Axios from 'axios';
 
 function login(data) {
-  return Api.post('/login', data, false);
+  return Api.post('/auth/signin',{ email: data.email, password: data.password }, false);
 }
 
 function logOut() {
@@ -73,7 +74,7 @@ function changePassword(data, language) {
 }
 
 function returnOrder(data, language) {
-  return Api.post(`/orders/returnOrder?language=${language}`,data, true);
+  return Api.post(`/orders/returnOrder?language=${language}`, data, true);
 }
 
 export const userService = {

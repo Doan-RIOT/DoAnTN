@@ -2,9 +2,6 @@ import { filter } from 'lodash';
 import { StyleSheet, Dimensions } from 'react-native';
 import { Sizes, Colors, ApplicationStyles } from '../../Theme';
 const { height, width } = Dimensions.get('window');
-const HEADER_MAX_HEIGHT = 400;
-const HEADER_MIN_HEIGHT = 220;
-const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 export default StyleSheet.create({
   summaryProcess: {
     width: "100%",
@@ -30,7 +27,7 @@ export default StyleSheet.create({
     flexDirection: "row",
   },
   image: {
-    height: 320,
+    height: height / 2,
     resizeMode: "cover",
     borderRadius: 20,
     paddingVertical: 10,
@@ -48,7 +45,6 @@ export default StyleSheet.create({
   },
   scrollView: {
     width: "100%",
-    marginTop: HEADER_MIN_HEIGHT,
     paddingHorizontal: 20,
   },
   header: {
@@ -57,6 +53,8 @@ export default StyleSheet.create({
     left: 0,
     right: 0,
     overflow: 'hidden',
+    height: height / 2,
+    paddingHorizontal: 20,
   },
   bar: {
     marginTop: "6%",
@@ -71,9 +69,9 @@ export default StyleSheet.create({
     left: 0,
     right: 0,
     width: null,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    height: HEADER_MAX_HEIGHT,
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+    height: height / 2,
     resizeMode: "stretch"
   },
   filter: {
@@ -92,6 +90,29 @@ export default StyleSheet.create({
   Title_summary: {
     color: Colors.catalinaBlue,
     marginLeft: "5%"
+  },
+  containBackground: {
+    position: 'absolute',
+    top: 0,
+    zIndex: 99
+  },
+  blackContain: {
+    opacity: 0.45,
+    width,
+    height: height
+  },
+  ProcessFilterContent: {
+    position: 'absolute',
+    bottom: 30,
+    width: '100%',
+    height: 600,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingTop: 10,
+    paddingHorizontal: 17,
+  },
+  input: {
+    borderColor: "#26C165",
+    fontSize: 20
   }
-
 })

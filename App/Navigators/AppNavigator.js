@@ -106,11 +106,9 @@ const ProfileStackNavigator = createStackNavigator(
     // own screen and remove the example.
     [Screens.PROFILE]: ProfileScreen,
     [Screens.DETAIL_ORDER]: DetailOrderScreen,
-    [Screens.USER_INFO]: UserInfoScreen,
     [Screens.LIST_ORDER]: ListOrderScreen,
     [Screens.PROMOTION]: PromotionScreen,
     [Screens.CANCEL_ORDER]: CancelOrderScreen,
-    [Screens.CHANGE_PASSWORD_USER]: ChangePasswordUserScreen,
     [Screens.REASON_RETURN_ORDER]: ReasonReturnOrderScreen
   },
   {
@@ -222,7 +220,9 @@ const rootStackNavigator = createStackNavigator(
     [Screens.ADD_EDIT_ADDRESS]: AddEditAddressScreen,
     [Screens.PAYMENT_METHOD]: PaymentMethodScreen,
     [Screens.ORDER_SUCCESS]: OrderSuccessScreen,
-    [Screens.PRODUCT_DESCRIPTION]: ProductDescriptionScreen
+    [Screens.PRODUCT_DESCRIPTION]: ProductDescriptionScreen,
+    [Screens.USER_INFO]: UserInfoScreen,
+    [Screens.CHANGE_PASSWORD_USER]: ChangePasswordUserScreen,
   },
   {
     initialRouteName: Screens.HOME,

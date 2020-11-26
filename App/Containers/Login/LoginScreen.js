@@ -18,7 +18,7 @@ import CartActions from '../../Stores/Cart/Actions';
 import { userService } from '../../Services/UserService';
 import { cartService } from '../../Services/CartService';
 import { Sizes, Images } from '../../Theme';
-import { saveToken, saveUserId, getCart, removeStorageItem, getToken } from '../../Utils/storage.helper';
+import { saveToken, saveUserName, savePassword, saveUserId, getCart, removeStorageItem, getToken } from '../../Utils/storage.helper';
 // import messaging from '@react-native-firebase/messaging';
 import { Screens } from '../../Utils/screens';
 import { Colors } from '../../Theme';
@@ -37,62 +37,6 @@ class LoginScreen extends Component {
       // password: '',
     }
   }
-
-  // handleGetDataCart = async customerId => {
-  //   const { cartActions } = this.props;
-  //   const dataCart = await getCart(customerId);
-  //   const dataCartAnonymous = await getCart('');
-  //   cartService.fetchCart(customerId, Constants.VI).then(response => {
-  //     if (response.success) {
-  //       const data = response.data ? response.data : {};
-  //       let temp = {};
-  //       if (dataCart !== null) {
-  //         const dataCartParse = JSON.parse(dataCart);
-  //         temp = mergeCart(data, dataCartParse.cart);
-  //       }
-  //       if (dataCartAnonymous !== null) {
-  //         const dataCartAnonymousParse = JSON.parse(dataCartAnonymous);
-  //         temp = mergeCart(temp, dataCartAnonymousParse.cart);
-  //         removeStorageItem(`${Constants.CART}_`);
-  //       }
-  //       const total = temp.totalProduct ? temp.totalProduct : 0;
-  //       temp.customerId = customerId;
-  //       cartActions.setDataToCart(temp, total, customerId);
-  //     } else {
-  //       if (dataCart !== null) {
-  //         const dataCartParse = JSON.parse(dataCart);
-  //         const { cart, total } = dataCartParse;
-  //         cartActions.setDataToCart(cart, total, customerId);
-  //       } else {
-  //         cartActions.setDataToCart({}, 0, customerId);
-  //       }
-  //     }
-  //   });
-  // };
-
-  // requestUserPermission = async userId => {
-  //   const authStatus = await messaging().requestPermission();
-  //   const enabled =
-  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED || authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-  //   if (enabled) {
-  //     messaging().getToken().then(token => {
-  //       if (userId && userId !== '') {
-  //         this.saveTokenToDatabase(userId, token);
-  //       }
-  //     });
-  //   }
-  // };
-
-  // saveTokenToDatabase = (userId, token) => {
-  //   const data = {
-  //     customerId: userId,
-  //     token,
-  //   };
-
-  //   try {
-  //     userService.saveToken(data);
-  //   } catch (error) { }
-  // };
 
   handleLogin = async () => {
     Keyboard.dismiss();
@@ -129,24 +73,10 @@ class LoginScreen extends Component {
             .then(response => {
               if (response) {
                 const { token } = response
-                console.log("tokenLog",response.token)
-
-                // const userInfo = {
-                //   token,
-                //   userId: customerId,
-                //   username
-                // };
-                // this.requestUserPermission(customerId);
-                //  .setInfoUser(userInfo);
-                saveToken(token);
-                // saveUserId(customerId);
-                // this.handleGetDataCart(customerId);
-                // userActions.fetchProfile(customerId);
-                // userActions.fetchAddress(customerId);
-                // cardsActions.fetchCards(customerId);
-                // userActions.fetchHistoriesOrder(customerId);
-                // userActions.fetchPromotion(customerId);
-                // userActions.fetchFavorites(customerId);
+                if(token){
+                  saveToken(token);
+                }
+                userActions.fetchProfile()
                 navigation.navigate(Screens.HOME);
               } else {
                 this.refs.toastFailed.show(strings('Login.msgLoginFailed'), DURATION.LENGTH_LONG);

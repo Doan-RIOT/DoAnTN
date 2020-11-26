@@ -9,8 +9,8 @@ function logOut() {
   return Api.get('/logout', true);
 }
 
-function fetchProfile(userId, language) {
-  return Api.get(`/customer/profile?customerId=${userId}&language=${language}`, true);
+function fetchProfile() {
+  return Api.get('/auth/profile', true);
 }
 
 function fetchAddress(userId, language) {
@@ -22,7 +22,7 @@ function fetchLocation() {
 }
 
 function updateProfile(data, language) {
-  return Api.post(`/customer/update?language=${language}`, data, true);
+  return Api.post(`/users/updateInfo`, data, true);
 }
 
 function updateAddress(data, language) {
@@ -46,7 +46,7 @@ function fetchDetailsHistoryOrder(orderId, language) {
 }
 
 function signUp(data) {
-  return Api.post(`/customer/create`, data, false);
+  return Api.post('/auth/register',{ email: data.username, password: data.password }, false);
 }
 
 function favorites(data) {

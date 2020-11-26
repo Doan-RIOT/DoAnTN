@@ -188,7 +188,7 @@ export default StyleSheet.create({
     },
     totalCostOfPhase: {
         backgroundColor: "#26C165",
-        marginTop: 5,
+        marginVertical: 5,
         paddingVertical: 10,
         paddingHorizontal: 10,
         flexDirection: 'row',

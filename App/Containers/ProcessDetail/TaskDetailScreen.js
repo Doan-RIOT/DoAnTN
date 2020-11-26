@@ -24,11 +24,13 @@ class TaskDetailScreen extends Component {
       isDatePickerVisible: false,
       setDatePickerVisibility: false,
       dateStart: '',
-      avatarSource: ''
+      avatarSource: '',
+      dataTask:{}
     }
   }
   componentDidMount() {
-
+    const { item } = this.props.navigation.state.params;
+    this.setState({dataTask:item})
   }
   renderImagePicker = () => {
     const options = {
@@ -59,6 +61,10 @@ class TaskDetailScreen extends Component {
     });
   }
   renderItemEstimatesCostPhase = (data) => {
+    var totalCost = 0;
+    for( var i=0; i< data.length; i++){
+      totalCost += data[i].quantity * data[i].unitPrice
+    }
     return (
       <Block flex={false} >
         {data.map((item) =>
@@ -70,23 +76,24 @@ class TaskDetailScreen extends Component {
                 <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
               </Block>
               <TextCurrency h3 semibold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice} />
-              <Icon
-                style={{ marginLeft: 20 }}
-                name="edit"
-                size={20}
-              />
+              
             </Block>
           </Block>
         )}
         <Block flex={false} row right style={{ marginVertical: 10 }}>
           <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.total')}: </Text>
-          <TextCurrency h3 bold color={Colors.catalinaBlue}>100 000 vnđ</TextCurrency>
+          <TextCurrency h3 bold color={Colors.catalinaBlue} value={totalCost}/>
+          <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
         </Block>
       </Block>
     )
   }
   renderEstimatesCostTask = () => {
-    const dataEstimatesProcess = [{ "id": 1, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }, { "id": 2, "name": "Phân Quế lâm", "quantity": 50, "unitPrice": "50000" }, { "id": 3, "name": "Đạm", "quantity": 50, "unitPrice": "50000" }]
+    var dataEstimatesProcess = []
+    const {materials} = this.state.dataTask
+    if(materials){
+      dataEstimatesProcess = materials
+    }
     return (
       <Block flex={false}>
         {this.renderItemEstimatesCostPhase(dataEstimatesProcess)}
@@ -103,11 +110,12 @@ class TaskDetailScreen extends Component {
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
             </Block>
             <Block flex={false} style={{ paddingVertical: 10 }}>
-              <Text h3 color={Colors.catalinaBlue}>Hướng dẫn đo : {item.sldd}</Text>
+              <Text h3 color={Colors.catalinaBlue}>Hướng dẫn đo: {item.sldd}</Text>
             </Block>
             <Block flex={false} row flex={false}>
               <Block style={{marginRight:5}}>
                 <Input
+                  editable={false}
                   label={"Sô liệu chuẩn"}
                   // error={hasErrors('username')}
                   style={[styles.input1]}
@@ -133,33 +141,20 @@ class TaskDetailScreen extends Component {
   render() {
     const { navigation } = this.props;
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
-    // const headerHeight = diffClamp.interpolate({
-    //   inputRange: [0, 55],
-    //   outputRange: [55, 0],
-    //   extrapolate: 'clamp',
-    // });
+    const { item,summaryProcess } = this.props.navigation.state.params;
+    const data = item;
+    const params = summaryProcess
+    console.log("1",summaryProcess)
     const headerTranslate = diffClamp.interpolate({
       inputRange: [0, 45],
       outputRange: [0, -60],
       extrapolate: 'clamp',
     });
-    const data = { "summaryQT": { "LoiNhuan": "30000000", "QuyMo": "200", "SanLuong": "300", "TenQuyTrinh": "Trồng lúa Organic", "chiPhiDauTu": "100000000", "thoiGianThucHien": "3" } }
     return (
       <Block style={{ backgroundColor: "#B8F39A" }}>
         <Block flex={false} style={styles.estimatesTime}>
           <Block row center style={{}}>
-            <Text bold h2>Ngày bắt đầu : 12/10/2020</Text>
-          </Block>
-          <Block flex={false} style={styles.line}></Block>
-          <Block row center>
-            <Text flex={false} bold h2>Ngày kết thúc : 12/11/2020</Text>
-            <TouchableOpacity>
-              <Icon
-                style={{ marginLeft: 20 }}
-                name="edit"
-                size={25}
-              />
-            </TouchableOpacity>
+            <Text bold h2>Thời gian thực hiện: {data.estimatedTime} {data.estimatedTimeUnit}</Text>
           </Block>
         </Block>
         <ScrollView style={styles.container}
@@ -169,18 +164,18 @@ class TaskDetailScreen extends Component {
         >
           <Block style={styles.taskContent}>
             <Block center midle flex={false}>
-              <Text h1 bold>Công việc</Text>
+              <Text h1 bold>{data.name}</Text>
             </Block>
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Mô tả</Text>
-              <Text h3>Làm đất</Text>
+              <Text h3 bold style={{ marginVertical: 10 }}>Mô tả công việc:</Text>
+              <Text h3>{data.description}</Text>
             </Block>
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Nguyên vât liệu</Text>
+              <Text h3 bold style={{ marginVertical: 10 }}>Nguyên vât liệu:</Text>
               {this.renderEstimatesCostTask()}
             </Block>
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Số liệu đo đạc</Text>
+              <Text h3 bold style={{ marginVertical: 10 }}>Số liệu đo đạc:</Text>
               {this.renderSLDD()}
             </Block>
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
@@ -191,9 +186,10 @@ class TaskDetailScreen extends Component {
             </Block>
             <Block flex={false} style={{ marginTop: 20, marginHorizontal: 20 }}>
               <Block row flex={false} style={{ justifyContent: 'space-between' }}>
-                <Text h3 bold>Cập nhật hình ảnh</Text>
+                <Text h3 bold>Hình ảnh</Text>
                 <TouchableOpacity
                   onPress={() => this.renderImagePicker()}
+                  disabled={true}
                 >
                   <Image source={Images.iconAwesomeCamera}></Image>
                 </TouchableOpacity>
@@ -207,13 +203,13 @@ class TaskDetailScreen extends Component {
         <Animated.View style={[styles.header, { transform: [{ translateY: headerTranslate }] }]}  >
           <Header
             isShowBack
-            title={'Trồng lúa Organic'}
+            title={summaryProcess.name}
             navigation={navigation}
           >
           </Header>
         </Animated.View>
         <TouchableOpacity style={styles.buttonImplement}
-        onPress={() => navigation.navigate(Screens.PROCESS_IMPLEMENT)}
+        onPress={() => navigation.navigate(Screens.PROCESS_IMPLEMENT,params)}
         >
           <Text h3 bold color={Colors.white}>Triển</Text>
           <Text h3 bold color={Colors.white}>Khai</Text>

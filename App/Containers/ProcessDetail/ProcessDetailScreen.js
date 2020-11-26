@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Sizes, Colors, ApplicationStyles, Images } from '../../Theme';
 import { Screens } from '../../Utils/screens';
 import {
-  Button, Block, BaseModal, Cart,
+  Button, Block, BaseModal, Cart,TextCurrency,
   Card, Header, Input, Picker, Loading, Text,
 } from "../../Components";
 import { Title } from 'react-native-paper';
@@ -13,52 +13,99 @@ import { strings } from '../../Locate/I18n';
 import { BarChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 import Carousel from 'react-native-snap-carousel';
+//redux
+import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
+import PropTypes, { number, string } from 'prop-types';
+import ProcessActions from '../../Stores/Process/Actions';
+import { Config } from '../../Config';
+
 const { width } = Dimensions.get('window');
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const widthCarousel = width - (ApplicationStyles.marginHorizontal.marginHorizontal * 2);
+
 class ProcessDetailScreen extends Component {
   constructor(props) {
     super(props)
     this.state = {
       Index: 0,
       scrollY: new Animated.Value(0),
-      carousel: [{ url: Images.slide1 }, { url: Images.slide2 }],
+      carousel: [],
+      carouselBackUp: [
+        { url: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80" }, 
+        { url: "https://images.unsplash.com/photo-1451440063999-77a8b2960d2b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80"}
+      ],
+      ProcessDetail: [],
     }
   }
   componentDidMount() {
-
+    const { params } = this.props.navigation.state;
+    const idProcess = params._id;
+    const { processActions } = this.props;
+    processActions.fetchProcessDetail(idProcess);
+    const {carousel} = this.state
+    //carousel
+    var images = params.images
+    var url = Config.API_URL
+    if(images){
+      for(var i =0 ; i<images.length;i++){
+        images[i]=images[i].replace("http://localhost:3000",url);
+        carousel.push({url:images[i]});
+        this.setState({carousel})
+      }
+    }
+  }
+  UNSAFE_componentWillUpdate (nextProps) {
+    const {processDetail}=this.props
+    if(nextProps.processDetail!==processDetail){
+      this.setState({ProcessDetail:nextProps.processDetail})
+    }
   }
   renderItemCarousel = ({ item, index }) => {
     return (
       <Block center middle flex={false} key={index}>
         <Image
-          source={item.url}
+          source={{uri:item.url}}
           style={styles.itemCarousel}
         />
       </Block>
     );
   }
   renderCarousel = () => {
-    const { carousel } = this.state;
+    const { carousel,carouselBackUp } = this.state;
+    var data= null
+    if(carousel[0] === undefined){
+      data =carouselBackUp
+    }else{
+      data = carousel
+    }
+
     return (
       <Block flex={false} style={{ ...ApplicationStyles.marginHorizontal, marginTop: 2 }}>
         <Carousel
-          data={carousel}
+          data={data}
           renderItem={this.renderItemCarousel}
           loop={true}
           autoplay={true}
           sliderWidth={widthCarousel}
           itemWidth={widthCarousel}
+          autoplayInterval= {4000}
         />
       </Block>
     );
   };
   renderSlidePhase = () => {
-    const summary = ["Thống kê", "Dự toán", "Bộ tiêu chí",];
-    const process = ["Giai đoạn 1", "Giai đoạn 2", "Giai đoạn 3", "Giai đoạn 4", "Giai đoạn 5",];
+    const summary = ["Thống kê", "Dự toán", "Điều kiện",];
+    const process = [];
+    const {phases} = this.state.ProcessDetail
+    if(phases){
+      for(var i=0; i < phases.length; i++){
+        process.push(`Giai đoạn${i+1}`);
+      }
+    }
     const summaryProcess = summary.concat(process);
-    summaryProcess.push("Kết thúc")
+    // summaryProcess.push("Kết thúc")
     return (
       <Block flex={false} style={{ height: 100 }} >
         <FlatList
@@ -88,11 +135,11 @@ class ProcessDetailScreen extends Component {
     this.setState({
       Index
     });
-    console.log(this.state.Index)
+    // console.log(this.state.Index)
   }
   renderItemQuestion = (item) => {
     return (
-      <Block flex={false} style={{ paddingHorizontal: 17, backgroundColor: "#E7F8FD", borderRadius: 10, paddingVertical: 10, marginBottom: 10 }}>
+      <Block  flex={false} style={{ paddingHorizontal: 17, backgroundColor: "#E7F8FD", borderRadius: 10, paddingVertical: 10, marginBottom: 10 }}>
         <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
         <Text h3 color={Colors.catalinaBlue} >{item.content}</Text>
         <Block flex={false} style={styles.line}></Block>
@@ -120,7 +167,7 @@ class ProcessDetailScreen extends Component {
           <Block flex={false}><Image source={Images.iconLand}></Image></Block>
           <Block row style={{ justifyContent: 'space-between' }}>
             <Text h3 style={styles.Title_summary}>{strings('HomeFarm.minimalScale')}:</Text>
-            <Text h3 bold style={styles.Title_summary}>{item.summaryQT.QuyMo}</Text>
+            <Text h3 bold style={styles.Title_summary}>{item.minimalScale} {item.standardUnit}</Text>
           </Block>
         </Block>
         <Block flex={false} style={styles.lineSummary}></Block>
@@ -128,7 +175,7 @@ class ProcessDetailScreen extends Component {
           <Block flex={false}><Image source={Images.iconCalendar}></Image></Block>
           <Block row style={{ justifyContent: 'space-between' }}>
             <Text h3 style={styles.Title_summary}>{strings('HomeFarm.executionTime')}:</Text>
-            <Text h3 bold style={styles.Title_summary}>{item.summaryQT.thoiGianThucHien} Tháng</Text>
+            <Text h3 bold style={styles.Title_summary}>{item.estimatedTime} {item.estimatedTimeUnit}</Text>
           </Block>
         </Block>
         <Block flex={false} style={styles.lineSummary}></Block>
@@ -136,7 +183,7 @@ class ProcessDetailScreen extends Component {
           <Block flex={false}><Image source={Images.iconSanLuong}></Image></Block>
           <Block row style={{ justifyContent: 'space-between' }}>
             <Text h3 style={styles.Title_summary}>{strings('HomeFarm.quantity')}:</Text>
-            <Text h3 bold style={styles.Title_summary}>{item.summaryQT.SanLuong}</Text>
+            <Text h3 bold style={styles.Title_summary}>{item.estimatedQuantity} kg</Text>
           </Block>
         </Block>
         <Block flex={false} style={styles.lineSummary}></Block>
@@ -144,7 +191,10 @@ class ProcessDetailScreen extends Component {
           <Block flex={false}><Image source={Images.iconInvest}></Image></Block>
           <Block row style={{ justifyContent: 'space-between' }}>
             <Text h3 style={styles.Title_summary}>{strings('HomeFarm.investmentCosts')}:</Text>
-            <Text h3 bold style={styles.Title_summary}>{item.summaryQT.chiPhiDauTu}</Text>
+            <Block row flex={false} >
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.estimatedCost} />
+              <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
+            </Block>
           </Block>
         </Block>
         <Block flex={false} style={styles.lineSummary}></Block>
@@ -152,7 +202,10 @@ class ProcessDetailScreen extends Component {
           <Block flex={false}><Image source={Images.iconMoney}></Image></Block>
           <Block row style={{ justifyContent: 'space-between' }}>
             <Text h3 style={styles.Title_summary}>{strings('HomeFarm.profit')}:</Text>
-            <Text h3 bold style={styles.Title_summary}>{item.summaryQT.LoiNhuan}</Text>
+            <Block row flex={false} >
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.unitPrice * item.estimatedQuantity - item.estimatedCost } />
+                <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
+              </Block>
           </Block>
         </Block>
       </Block>
@@ -225,7 +278,7 @@ class ProcessDetailScreen extends Component {
     )
   }
   renderStatistical = () => {
-    const data = { "summaryQT": { "LoiNhuan": "30000000", "QuyMo": "200", "SanLuong": "300", "TenQuyTrinh": "Trồng lúa Organic", "chiPhiDauTu": "100000000", "thoiGianThucHien": "3" } }
+    const { params } = this.props.navigation.state
     const dataChart = [
       { "id": "1230", "tracker": "Cung", "description": [{ "label": "1", "value": "2000" }, { "label": "2", "value": "2000" }, { "label": "3", "value": "2000" }], "status": "New", "priority": "Normal", "parentTask": 1228, "image": "", "planStartDate": null, "planEndDate": null, "actualStartDate": null, "actualEndDate": null, "estimatedTime": "", "actualTime": "", "done": "0%", "nvlName": "", "nvlQuantityPlan": "", "nvlUnitPricePlan": "", "nvlQuantityActual": "", "nvlUnitPriceActual": "", "slddName": "", "slddDonVi": "", "slddGiaTriChuan": "", "slddActualValue": "" },
       { "id": "1230", "tracker": "Cau", "description": [{ "label": "1", "value": "2000" }, { "label": "2", "value": "2000" }, { "label": "3", "value": "2000" }], "status": "New", "priority": "Normal", "parentTask": 1228, "image": "", "planStartDate": null, "planEndDate": null, "actualStartDate": null, "actualEndDate": null, "estimatedTime": "", "actualTime": "", "done": "0%", "nvlName": "", "nvlQuantityPlan": "", "nvlUnitPricePlan": "", "nvlQuantityActual": "", "nvlUnitPriceActual": "", "slddName": "", "slddDonVi": "", "slddGiaTriChuan": "", "slddActualValue": "" },
@@ -234,7 +287,7 @@ class ProcessDetailScreen extends Component {
     return (
       <Block center flex={false} style={styles.statistical}>
         <Block flex={false} style={styles.summaryProcess} >
-          {this.renderSummaryProcess(data)}
+          {this.renderSummaryProcess(params)}
         </Block>
         <Block flex={false} style={styles.chart}>
           <Block flex={false} row>
@@ -254,32 +307,60 @@ class ProcessDetailScreen extends Component {
     )
   }
   renderItemEstimatesCostPhase = (data) => {
+    var dataTask =[]
+    for(var i=0; i<data.length; i++){
+      dataTask = dataTask.concat(data[i].materials)
+    }
+    var totalCost = 0;
+    for(var i=0; i<dataTask.length; i++){
+      totalCost += dataTask[i].quantity * dataTask[i].unitPrice
+    }
     return (
       <Block flex={false} >
-        {data.map((item) =>
-          <Block center flex={false} style={styles.ItemEstimatesPhase}>
+        {dataTask.map((item) =>
+          <Block key={item.id}  center flex={false} style={styles.ItemEstimatesPhase}>
             <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
             <Block row style={{ justifyContent: 'space-between' }}>
               <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
                 <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
               </Block>
-              <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity * item.unitPrice}</Text>
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice}/>
             </Block>
           </Block>
         )}
         <Block flex={false} row right style={{ marginVertical: 10 }}>
           <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.total')}: </Text>
-          <Text h3 bold color={Colors.catalinaBlue}>100 000 vnđ</Text>
+          <TextCurrency h3 bold color={Colors.catalinaBlue} value={totalCost} />
+          <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
         </Block>
       </Block>
     )
   }
   renderItemEstimatesCostProcess = (data) => {
+    var dataTask = []
+    for(var i=0; i<data.length; i++){
+      dataTask = dataTask.concat(data[i].tasks)
+    }
+    var dataMaterials =[]
+    for(var i=0; i<dataTask.length; i++){
+      dataMaterials = dataMaterials.concat(dataTask[i].materials)
+    }
+    var totalCost = 0;
+    for(var i=0; i<dataMaterials.length; i++){
+      totalCost += dataMaterials[i].quantity * dataMaterials[i].unitPrice
+    }
     return (
       <Block flex={false}>
+        <Block flex={false} style={styles.totalCostOfPhase}>
+          <Text h3 bold color={Colors.white}>{strings('Process.totalCost')} :</Text>
+          <Block row flex={false}>
+            <TextCurrency h3 bold color={Colors.white} value={totalCost}/>
+            <Text h3 bold color={Colors.white}> vnđ</Text>
+          </Block>
+        </Block>
         {data.map((item) =>
-          <Block flex={false} style={styles.ItemEstimatesProcess}>
+          <Block key={item.id} flex={false} style={styles.ItemEstimatesProcess}>
             <Block flex={false} style={{ marginBottom: 10 }}>
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
             </Block>
@@ -289,69 +370,70 @@ class ProcessDetailScreen extends Component {
                   <Image source={Images.iconMaterialTime} style={{ resizeMode: "stretch", marginRight: 10 }}></Image>
                 </Block>
                 <Text h3 color={Colors.catalinaBlue}>{strings('Process.time')}: </Text>
-                <Text h3 color={Colors.catalinaBlue}>{item.estimatesTime} ngày</Text>
+                <Text h3 color={Colors.catalinaBlue}>{item.estimatedTime} {item.estimatedTimeUnit}</Text>
               </Block>
               <Block flex={false}>
-                {this.renderItemEstimatesCostPhase(item.dataEstimatesPhase)}
+                {this.renderItemEstimatesCostPhase(item.tasks)}
               </Block>
             </Block>
           </Block>
         )}
-        <Block style={styles.totalCostOfPhase}>
-          <Text h3 bold color={Colors.white}>{strings('Process.totalCost')} :</Text>
-          <Text h3 bold color={Colors.white}>100 0000 vnđ</Text>
-        </Block>
       </Block>
     )
   }
   renderEstimatesCostProcess = () => {
-    const dataEstimatesProcess = [
-      { "name": "Giai đoạn 1", "estimatesTime": 15, "dataEstimatesPhase": [{ "id": 1, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }, { "id": 2, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }, { "id": 3, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }] },
-      { "name": "Giai đoạn 2", "estimatesTime": 15, "dataEstimatesPhase": [{ "id": 1, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }, { "id": 2, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }, { "id": 3, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }] }]
+    const {phases} = this.state.ProcessDetail
     return (
       <Block flex={false} style={styles.renderContent}>
-        {this.renderItemEstimatesCostProcess(dataEstimatesProcess)}
+        {this.renderItemEstimatesCostProcess(phases)}
       </Block>
     )
   }
   renderStandard = () => {
     return (
       <Block flex={false}>
-        <Text h2 > Bộ tiêu chí</Text>
+        <Text h2 >Điều kiện</Text>
       </Block>
     )
   }
   renderTask = (data) => {
+    const { params } = this.props.navigation.state;
+    if(params){
+      var summaryProcess = params
+    }
     const { navigation } = this.props;
     return (
       <Block flex={false}>
         {data.map((item) =>
-          <Block center flex={false} row style={{ marginBottom: 10 }} >
+          <Block key={item.id} center flex={false} row style={{ marginBottom: 10 }} >
             <Block flex={false} style={styles.dot} />
             <TouchableOpacity style={styles.task}
-             onPress={() => navigation.navigate(Screens.TASK)}
+             onPress={() => navigation.navigate(Screens.TASK,{item,summaryProcess})}
             >
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
-              <Text h4 color={Colors.catalinaBlue}>{item.estimatesTime} Ngày</Text>
+              <Text h4 color={Colors.catalinaBlue}>{item.estimatedTime} {item.estimatedTimeUnit}</Text>
             </TouchableOpacity>
           </Block>
         )}
       </Block>
     )
   }
-  renderProcess = () => {
-    const dataEstimatesProcess =
-      [{ "id": 1, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }, { "id": 2, "name": "Phân Quế lâm", "quantity": 50, "unitPrice": "50000" }, { "id": 3, "name": "Đạm", "quantity": 50, "unitPrice": "50000" }]
-    const listTask = [{ "id": "1", "name": "Vệ sinh đồng ruộng", "estimatesTime": 4, }, { "id": "2", "name": "Làm đất", "estimatesTime": 6, }, { "id": "3", "name": "Bón phân quế lâm", "estimatesTime": 5, }, { "id": "4", "name": "Bón phân NPK", "estimatesTime": 3, }]
+  renderProcess = (data) => {
+    var listTask = []
+    var dataEstimatesProcess = []
+    if(data){
+      dataEstimatesProcess= data.tasks;
+      listTask=data.tasks
+    }  
     return (
       <Block flex={false} style={styles.renderContent}>
-        <Text h2 bold color={Colors.catalinaBlue}>Giai đoạn chuẩn bị giống và làm đất</Text>
+        <Text h2 bold color={Colors.catalinaBlue}>{data.name}</Text>
         <Block flex={false} row center flex={false} style={{ paddingVertical: 10 }} >
           <Block flex={false} center middle flex={false}>
             <Image source={Images.iconMaterialTime} style={{ resizeMode: "stretch", marginRight: 10 }}></Image>
           </Block>
           <Text h3 color={Colors.catalinaBlue}>{strings('Process.time')}: </Text>
-          <Text h3 color={Colors.catalinaBlue}>ngày</Text>
+          <Text h3 color={Colors.catalinaBlue}>{data.estimatedTime} {data.estimatedTimeUnit}</Text>
         </Block>
         <Block flex={false} style={styles.estimatesPhase}>
           <Block row center flex={false} style={{ marginBottom: 10 }}>
@@ -382,6 +464,7 @@ class ProcessDetailScreen extends Component {
 
   }
   renderContentprocess = () => {
+    const {phases} = this.state.ProcessDetail
     const index = this.state.Index
     switch (index) {
       case 0:
@@ -403,15 +486,24 @@ class ProcessDetailScreen extends Component {
           </Block>
         );
       default:
+        var data = {}
+        if(phases){
+          for(var i = 0;i<phases.length;i++){
+          if(index === i+3){
+            data =phases[i]
+          }
+        }
+        }
         return (
           <Block flex={false} >
-            {this.renderProcess()}
+            {this.renderProcess(data)}
           </Block>
         )
     }
   }
   render() {
     const { navigation } = this.props;
+    const { params } = this.props.navigation.state;
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
     // const headerHeight = diffClamp.interpolate({
     //   inputRange: [0, 55],
@@ -423,7 +515,6 @@ class ProcessDetailScreen extends Component {
       outputRange: [0, -60],
       extrapolate: 'clamp',
     });
-    const data = { "summaryQT": { "LoiNhuan": "30000000", "QuyMo": "200", "SanLuong": "300", "TenQuyTrinh": "Trồng lúa Organic", "chiPhiDauTu": "100000000", "thoiGianThucHien": "3" } }
     return (
       <Block>
         <ScrollView style={styles.container}
@@ -458,13 +549,13 @@ class ProcessDetailScreen extends Component {
         <Animated.View style={[styles.header, { transform: [{ translateY: headerTranslate }] }]}  >
           <Header
             isShowBack
-            title={'Trồng lúa Organic'}
+            title={params.name}
             navigation={navigation}
           >
           </Header>
         </Animated.View>
         <TouchableOpacity style={styles.buttonImplement}
-          onPress={() => navigation.navigate(Screens.PROCESS_IMPLEMENT)}
+          onPress={() => navigation.navigate(Screens.PROCESS_IMPLEMENT,params)}
         >
           <Text h3 bold color={Colors.white}>Triển</Text>
           <Text h3 bold color={Colors.white}>khai</Text>
@@ -474,4 +565,11 @@ class ProcessDetailScreen extends Component {
     )
   }
 }
-export default ProcessDetailScreen;
+const mapStateToprop = (state) => ({
+  processDetail: state.process.processDetail
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  processActions: bindActionCreators(ProcessActions, dispatch),
+})
+export default connect(mapStateToprop, mapDispatchToProps)(ProcessDetailScreen);

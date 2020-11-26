@@ -21,7 +21,6 @@ export default StyleSheet.create({
         height: height / 10,
         marginTop: 70,
         borderRadius: 10,
-        flexDirection: "row",
         alignItems: "center",
     },
     input: {
@@ -31,7 +30,7 @@ export default StyleSheet.create({
         borderColor: "#D6D6D6",
         borderRadius: 5,
         marginTop: 5,
-        backgroundColor: Colors.white
+        backgroundColor: Colors.white,
     },
     location: {
         height: height / 3,

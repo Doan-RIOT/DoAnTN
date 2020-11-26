@@ -97,7 +97,7 @@ class ProjectDetailScreen extends Component {
     this.setState({
       Index
     });
-    console.log(this.state.Index)
+    // console.log(this.state.Index)
   }
   renderItemQuestion = (item) => {
     return (

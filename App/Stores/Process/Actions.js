@@ -4,8 +4,11 @@ const {Types,Creators} = createActions({
     fetchProcess: null,
     fetchProcessSuccess: ['process'],
 
-    fetchProcessDetail: null,
+    fetchProcessDetail: ['idProcess'],
     fetchProcessDetailSuccess: ['processDetail'],
+
+    fetchListProcess: null,
+    fetchListProcessSuccess:['ListProcess'],
 })
 export const ProcessTypes = Types;
 export default Creators;

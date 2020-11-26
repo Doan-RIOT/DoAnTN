@@ -20,7 +20,7 @@ import { createActions } from 'reduxsauce'
  */
 const { Types, Creators } = createActions({
   setInfoUser: ['user'],
-  fetchProfile: ['userId'],
+  fetchProfile: null,
   fetchProfileLoading: null,
   fetchProfileSuccess: ['profile'],
   fetchProfileFailure: ['errorMessage'],

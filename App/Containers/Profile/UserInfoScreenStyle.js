@@ -6,19 +6,21 @@ export default StyleSheet.create({
     paddingHorizontal: Sizes.base * 2
   },
   view: {
-    ...ApplicationStyles.backgroundView,
+    justifyContent: 'center',
+    flex:1
   },
   container: {
     ...ApplicationStyles.marginHorizontal,
-    ...ApplicationStyles.marginTop10,
+    marginTop:60,
     ...ApplicationStyles.borderRadiusItem,
     ...ApplicationStyles.backgroundItem,
     ...ApplicationStyles.padding,
+    opacity: 0.7
   },
   avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 70/ 2,
+    width: 100,
+    height: 100,
+    borderRadius: 100/ 2,
     borderWidth: 1,
     padding: 2,
     backgroundColor: Colors.green,

@@ -317,7 +317,8 @@
     "investmentCosts":"Chi phí đầu tư",
     "detail":"Chi tiết",
     "quantity":"Sản lượng",
-    "profit":"Lợi nhuận"
+    "profit":"Lợi nhuận" ,
+    "scale" :"Quy mô"
   },
   "Process":{
     "processDetail": "Chi tiết quy trình",

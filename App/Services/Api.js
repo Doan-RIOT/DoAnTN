@@ -1,13 +1,19 @@
-import axios from 'axios';
-import { Config } from 'App/Config';
-import { is, curryN, gte } from 'ramda';
-import { getToken } from '../Utils/storage.helper';
+import axios from "axios";
+import { Config } from "App/Config";
+import { is, curryN, gte } from "ramda";
+import { getToken } from "../Utils/storage.helper";
 
 const isWithin = curryN(3, (min, max, value) => {
-  const isNumber = is(Number)
-  return isNumber(min) && isNumber(max) && isNumber(value) && gte(value, min) && gte(max, value)
-})
-const in200s = isWithin(200, 299)
+  const isNumber = is(Number);
+  return (
+    isNumber(min) &&
+    isNumber(max) &&
+    isNumber(value) &&
+    gte(value, min) &&
+    gte(max, value)
+  );
+});
+const in200s = isWithin(200, 299);
 
 /**
  * This is an example of a service that connects to a 3rd party API.
@@ -20,17 +26,17 @@ const axiosDefault = axios.create({
    */
   baseURL: Config.API_URL,
   headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
+    Accept: "application/json",
+    "Content-Type": "application/json",
   },
   timeout: 6000,
-})
+});
 
 async function addToken() {
   const token = await getToken();
-  const bearer = token ? `Bearer ${token}` : '';
-  axiosDefault.defaults.headers.common['Authorization'] = bearer;
-};
+  const bearer = token ? `Bearer ${token}` : "";
+  axiosDefault.defaults.headers.common["Authorization"] = bearer;
+}
 
 async function get(url, isNeedToken, params) {
   try {
@@ -39,16 +45,18 @@ async function get(url, isNeedToken, params) {
     }
     const response = await axiosDefault.get(url, {
       params: params,
-      paramsSerializer: params => {
+      paramsSerializer: (params) => {
         return qs.stringify(params, { arrayFormat: "repeat" });
-      }
+      },
     });
     if (in200s(response.status)) {
-      return response.data
+      // console.log('apiget1',response.data)
+      return response.data;
     }
+    // console.log('apiget2',response)
     return response;
   } catch (error) {
-    return { status: 500, success: false, message:'Error' };
+    return { status: 500, success: false, message: "Error" };
   }
 }
 
@@ -58,21 +66,22 @@ async function post(url, data, isNeedToken, isPostForm) {
       await addToken();
     }
     if (isPostForm) {
-      axiosDefault.defaults.headers.common['Content-Type'] = 'multipart/form-data';
+      axiosDefault.defaults.headers.common["Content-Type"] =
+        "multipart/form-data";
     }
     const response = await axiosDefault.post(url, data);
     if (in200s(response.status)) {
-      console.log("data1",response.data)
-      return response.data
+      // console.log("data1", response);
+      return response.data;
     }
-    console.log("data2",response)
+    // console.log("data2", response);
     return response;
   } catch (error) {
-    return { status: 500, success: false, message:'Error' };
+    return { status: 500, success: false, message: "Error" };
   }
 }
 
 export const Api = {
   get,
   post,
-}
+};

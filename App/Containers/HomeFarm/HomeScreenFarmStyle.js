@@ -46,6 +46,7 @@ export default StyleSheet.create({
   scrollView: {
     width: "100%",
     paddingHorizontal: 20,
+    marginBottom:50
   },
   header: {
     position: 'absolute',

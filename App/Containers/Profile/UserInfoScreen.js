@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
 import PropTypes, { string } from 'prop-types';
 import Toast, { DURATION } from 'react-native-easy-toast';
-import { Image, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { Image, TouchableOpacity, ScrollView, Platform, ImageBackground } from 'react-native';
 import RNRestart from 'react-native-restart';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { PERMISSIONS, requestMultiple, checkMultiple } from 'react-native-permissions';
@@ -12,7 +12,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
 import {
-  Button, Block,Text, BaseModal,
+  Button, Block, Text, BaseModal,
   Card, Header, Loading, CheckBox, TextCurrency, Input, Radio
 } from "../../Components";
 import UserActions from '../../Stores/User/Actions';
@@ -40,9 +40,9 @@ class UserInfoScreen extends Component {
       msgError: '',
     }
   }
-  static getDerivedStateFromProps(nextProps, prevState){
+  static getDerivedStateFromProps(nextProps, prevState) {
     const { errorCode, navigation } = nextProps;
-    let data = { errorCode, profile : navigation.state.params };
+    let data = { errorCode, profile: navigation.state.params };
     return data;
   }
 
@@ -50,7 +50,7 @@ class UserInfoScreen extends Component {
     this.requestPermission();
   };
 
-  requestPermission = async() => {
+  requestPermission = async () => {
     await requestMultiple(
       Platform.select({
         android: [PERMISSIONS.ANDROID.CAMERA, PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE],
@@ -90,7 +90,7 @@ class UserInfoScreen extends Component {
   handleConfirm = birthDate => {
     this.hideDatePicker();
     let { profile } = this.state;
-    profile.birthDate = moment(birthDate).format('DD/MM/YYYY');
+    profile.dob = birthDate;
     this.setState({
       profile,
     })
@@ -116,13 +116,13 @@ class UserInfoScreen extends Component {
     return (
       <Block row style={{ justifyContent: 'center' }}>
         <TouchableOpacity
-          style={{marginVertical: 10}}
+          style={{ marginVertical: 10 }}
           onPress={() => this.openCamera()}
         >
           <Icon name="camera" size={40} color={Colors.green} />
         </TouchableOpacity>
         <TouchableOpacity
-          style={{marginVertical: 10, marginLeft: 10}}
+          style={{ marginVertical: 10, marginLeft: 10 }}
           onPress={() => this.openPicker()}
         >
           <Icon name="folder-open" size={42} color={Colors.green} />
@@ -133,7 +133,7 @@ class UserInfoScreen extends Component {
 
   renderFooterModal = () => {
     return (
-      <Block flex={false} bottom style={{ alignItems: 'flex-end'}}>
+      <Block flex={false} bottom style={{ alignItems: 'flex-end' }}>
         <Button
           pink2
           onPress={() => this.handleCloseModal()}
@@ -162,7 +162,7 @@ class UserInfoScreen extends Component {
       if (image.path && image.mime) {
         const name = image.path.replace(/^.*[\\\/]/, '');
         let data = new FormData();
-        data.append('files',{
+        data.append('files', {
           uri: image.path,
           name: name,
           type: image.mime
@@ -195,7 +195,7 @@ class UserInfoScreen extends Component {
       if (image.path && image.mime) {
         const name = image.path.replace(/^.*[\\\/]/, '');
         let data = new FormData();
-        data.append('files',{
+        data.append('files', {
           uri: image.path,
           name: name,
           type: image.mime
@@ -218,12 +218,6 @@ class UserInfoScreen extends Component {
       }
     });
   };
-
-  defineDateTimePicker = birthDate => {
-    const split = birthDate.split('/');
-    return new Date(split[2], split[1] - 1, split[0]);
-  };
-
   handleChange = (value, key) => {
     let { profile } = this.state;
     profile[key] = value;
@@ -234,14 +228,14 @@ class UserInfoScreen extends Component {
 
   handleSave = () => {
     let { profile } = this.state;
+    const {fullName,phone,dob,gender} = this.state.profile
+    const profileUpdate = {"fullName":fullName,"phone":phone,"dob":Date.parse(dob),"gender":gender,}
+    console.log('profileUpdate',profileUpdate)
     const { language, userActions, navigation } = this.props;
     let errors = [];
     let msgError = '';
 
-    if (profile.lastName === '' || profile.lastName === null) {
-      errors.push('lastName');
-      msgError = strings('UserInfo.msgErrorRequiredName');
-    } else if (profile.firstName === '' || profile.firstName === null) {
+    if (profile.fullName === '' || profile.fullName === null) {
       errors.push('firstName');
       msgError = strings('UserInfo.msgErrorRequiredName');
     } else if (profile.phone === '' || profile.phone === null) {
@@ -256,16 +250,9 @@ class UserInfoScreen extends Component {
 
     if (errors.length === 0) {
       try {
-        userService.updateProfile(profile, language).then(response => {
-          if (response.success) {
-            const { customerId } = response.data;
-            this.refs.toastSuccess.show(strings('UserInfo.msgUpdateProfileSuccess'), DURATION.LENGTH_LONG);
-            userActions.fetchProfile(customerId);
-            navigation.navigate(Screens.PROFILE);
-          } else {
-            this.refs.toastFailed.show(strings('UserInfo.msgUpdateProfileFailed'), DURATION.LENGTH_LONG);
-          }
-        });
+        userService.updateProfile(profile, language)
+        userActions.fetchProfile()
+        navigation.navigate(Screens.PROFILE);
       } catch (error) {
         this.refs.toastFailed.show(strings('UserInfo.msgUpdateProfileFailed'), DURATION.LENGTH_LONG);
       }
@@ -277,7 +264,7 @@ class UserInfoScreen extends Component {
     const dataCart = await getCart('');
     if (dataCart !== null) {
       const dataCartParse = JSON.parse(dataCart);
-      const { cart, total } =  dataCartParse;
+      const { cart, total } = dataCartParse;
       cartActions.setDataToCart(cart, total, '');
     } else {
       cartActions.setDataToCart({}, 0, '');
@@ -286,15 +273,9 @@ class UserInfoScreen extends Component {
 
   handleLogout = () => {
     const { userActions } = this.props;
-    userService.logOut().then(response => {
-      if (response.success) {
-        resetUser();
-        userActions.resetUser();
-        this.handleGetcart();
-        LoginManager.logOut()
-        RNRestart.Restart();
-      }
-    });
+    resetUser();
+    userActions.resetUser();
+    RNRestart.Restart();
   };
 
   render() {
@@ -303,54 +284,46 @@ class UserInfoScreen extends Component {
       isVisible, profile, isOpen,
       errorCode, errors, msgError
     } = this.state;
-    const dateTimePicker = profile && profile.birthDate ? this.defineDateTimePicker(profile.birthDate) : new Date();
+    const dateTimePicker = profile.dob
     const hasErrors = (key) => (errors.includes(key) ? Style.hasErrors : null)
     const imageUrl = `${Config.IMAGE_URL}?uploadId=${profile.avatar ? profile.avatar : ''}&seq=1`;
 
-    if ( errorCode === '401') {
+    if (errorCode === '401') {
       resetUser();
       userActions.resetUser();
       navigation.navigate(Screens.LOGIN);
     }
     return (
-      <Block style={Style.view}>
-        <Header 
+      <ImageBackground style={Style.view}
+        source={Images.farmImage} style={{ flex: 1, }} imageStyle={{ resizeMode: "stretch" }}>
+        <Header
           title={strings('Profile.headerTitle')}
           isShowBack
           navigation={navigation}
         />
         <ScrollView>
-          <TouchableOpacity onPress={() => this.selectImage()}>
-            <Image 
-              source={profile.avatar ? { uri:  imageUrl} : Images.avatar}  
-              style={Style.avatar} 
-            />
-            <Text style={Style.labelChange}>
-              {strings('UserInfo.changeImage')}
-            </Text>
-          </TouchableOpacity>
           <Block flex={false} style={Style.container}>
             <Text error>{msgError}</Text>
             <Input
-              label={strings('UserInfo.lastName')}
-              error={hasErrors('lastName')}
-              style={[Style.input, hasErrors('lastName')]}
-              value={profile && profile.lastName ? profile.lastName : ''}
-              onChangeText={text => this.handleChange(text, 'lastName')}
-            />
-            <Input
-              label={strings('UserInfo.firstName')}
+              label={'Họ và tên'}
               error={hasErrors('firstName')}
               style={[Style.input, hasErrors('firstName')]}
-              value={profile && profile.firstName ? profile.firstName : ''}
-              onChangeText={text => this.handleChange(text, 'firstName')}
+              value={profile && profile.fullName ? profile.fullName : ''}
+              onChangeText={text => this.handleChange(text, 'fullName')}
             />
             <Input
               label={strings('UserInfo.email')}
               error={hasErrors('email')}
               style={Style.input}
-              value={profile && profile.email ? profile.email : ''}
+              value={profile && profile.local.email ? profile.local.email : ''}
               onChangeText={text => this.handleChange(text, 'email')}
+            />
+            <Input
+              label={'Địa chỉ'}
+              error={hasErrors('email')}
+              style={Style.input}
+              value={profile && profile.address ? profile.address : ''}
+              onChangeText={text => this.handleChange(text, 'address')}
             />
             <Input
               label={strings('UserInfo.phone')}
@@ -362,8 +335,8 @@ class UserInfoScreen extends Component {
             />
             <TouchableOpacity onPress={() => this.showDatePicker()}>
               <Input
-                label={`${strings('UserInfo.birthDate')}`}
-                value={profile && profile.birthDate ? profile.birthDate : ''} 
+                label={'Ngày sinh'}
+                value={moment(profile.dob).format('DD/MM/YYYY')} 
                 style={Style.input}
                 onChangeText={text => this.handleChange(text, 'birthDate')}
                 rightLabel={
@@ -378,14 +351,14 @@ class UserInfoScreen extends Component {
               />
             </TouchableOpacity>
             <Block row>
-              <Block flex={false} style={{width: '30%'}}>
+              <Block flex={false} style={{ width: '30%' }}>
                 <Radio
                   label={strings('UserInfo.male')}
                   value="0"
                   color={Colors.pink2}
                   styleTitle={Style.radio}
                   uncheckedColor={Colors.green}
-                  checked={profile && profile.gender && profile.gender === '0'}
+                  checked={profile && profile.gender && profile.gender === true}
                   onPress={value => this.handleChange(value, 'gender')}
                 />
               </Block>
@@ -396,12 +369,12 @@ class UserInfoScreen extends Component {
                   color={Colors.pink2}
                   styleTitle={Style.radio}
                   uncheckedColor={Colors.green}
-                  checked={profile && profile.gender && profile.gender === '1'}
+                  checked={profile && profile.gender && profile.gender === false}
                   onPress={value => this.handleChange(value, 'gender')}
                 />
               </Block>
             </Block>
-            <Block flex={false} center style={{paddingTop: 20}}>
+            <Block flex={false} center style={{ paddingTop: 20 }}>
               <Button
                 green
                 onPress={() => this.handleSave()}
@@ -413,7 +386,7 @@ class UserInfoScreen extends Component {
               </Button>
               <Button
                 primary
-                onPress={() => {navigation.navigate(Screens.CHANGE_PASSWORD_USER, {customerId: profile.customerId})}}
+                onPress={() => { navigation.navigate(Screens.CHANGE_PASSWORD_USER, { customerId: profile.customerId }) }}
                 style={Style.button}
               >
                 <Text bold white center style={{ padding: 10 }}>
@@ -431,6 +404,15 @@ class UserInfoScreen extends Component {
               </Button>
             </Block>
           </Block>
+          <TouchableOpacity style={{ alignSelf: 'center', position: "absolute", }} onPress={() => this.selectImage()} >
+            <Image
+              source={profile.avatar ? { uri: imageUrl } : Images.avatar}
+              style={Style.avatar}
+            />
+            <Text style={Style.labelChange}>
+              {strings('UserInfo.changeImage')}
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
         {isVisible && (
           <DateTimePickerModal
@@ -443,7 +425,7 @@ class UserInfoScreen extends Component {
         )}
         <Toast
           ref="toastSuccess"
-          style={{backgroundColor: Colors.green}}
+          style={{ backgroundColor: Colors.green }}
           position='top'
           positionValue={200}
           fadeInDuration={750}
@@ -452,7 +434,7 @@ class UserInfoScreen extends Component {
         />
         <Toast
           ref="toastFailed"
-          style={{backgroundColor: Colors.accent}}
+          style={{ backgroundColor: Colors.accent }}
           position='top'
           positionValue={200}
           fadeInDuration={750}
@@ -464,10 +446,10 @@ class UserInfoScreen extends Component {
           isOpen={isOpen}
           bodyModal={this.renderBodyModal}
           footerModal={this.renderFooterModal}
-          onCancel={this.handleCloseModal} 
+          onCancel={this.handleCloseModal}
           useScrollView={true}
         />
-      </Block>
+      </ImageBackground>
     );
   }
 }

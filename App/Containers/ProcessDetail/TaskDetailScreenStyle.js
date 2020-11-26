@@ -41,9 +41,9 @@ export default StyleSheet.create({
         borderWidth: 0.5,
     },
     estimatesTime: {
-        marginHorizontal: 20,
+        marginHorizontal: 10,
         height: height / 5,
-        marginTop: 50,
+        marginTop: 30,
         position: 'absolute',
         top: 0,
         left: 0,
@@ -52,7 +52,7 @@ export default StyleSheet.create({
     },
     taskContent: {
         backgroundColor: Colors.white,
-        marginTop: height / 4 + 20,
+        marginTop: height / 5 ,
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
     },

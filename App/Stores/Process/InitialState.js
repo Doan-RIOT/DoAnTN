@@ -1,4 +1,5 @@
 export const INITIAL_STATE = {
     process: {},
-    processDetail:{}
+    processDetail:{},
+    ListProcess:{}
 }

@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { Sizes, Colors, ApplicationStyles } from '../../Theme';
-
+const { height, width } = Dimensions.get('window');
 export default StyleSheet.create({
   header: {
     paddingHorizontal: Sizes.base * 2
@@ -9,19 +9,25 @@ export default StyleSheet.create({
     ...ApplicationStyles.backgroundView,
   },
   container: {
-    ...ApplicationStyles.marginHorizontal,
-    ...ApplicationStyles.marginTop10,
-    ...ApplicationStyles.borderRadiusItem,
-    ...ApplicationStyles.backgroundItem,
-    ...ApplicationStyles.padding,
+    marginHorizontal: 10,
+    marginTop: height / 4,
+    borderRadius: 10,
+    backgroundColor: Colors.white,
+    padding: 10,
+    opacity: 0.7
   },
   avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 70/ 2,
+    width: 100,
+    height: 100,
+    borderRadius: 100 / 2,
     borderWidth: 1,
     padding: 2,
-    backgroundColor: Colors.green
+    backgroundColor: Colors.green,
+    position: "absolute",
+    marginTop: height / 6,
+  },
+  logInOut: {
+    marginTop: height / 4,
   },
   item: {
     flexWrap: "wrap",
@@ -29,7 +35,7 @@ export default StyleSheet.create({
     borderTopWidth: 1,
     paddingVertical: 5,
   },
-  associate : {
+  associate: {
     ...ApplicationStyles.padding,
   },
   iconAssociate: {

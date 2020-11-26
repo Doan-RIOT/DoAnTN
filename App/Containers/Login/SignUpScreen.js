@@ -44,19 +44,12 @@ class SignUpScreen extends Component {
     const data = {
       username: username,
       password,
-      gender,
     };
 
     this.setState({ loading: true });
     const regex = /([0-9])+([0-9]{9})\b/g
     setTimeout(() => {
-      if (data.username == "") {
-        errors.push("username");
-        msgError = strings('Login.msgErrorRequiredUsername');
-      } else if (!regex.exec(data.username)) {
-        errors.push("username");
-        msgError = strings('Login.msgErrorFormatUsername');
-      } else if (data.password === '') {
+      if (data.password === '') {
         errors.push("password");
         msgError = strings('Login.msgErrorRequiredPassword');
       } else if (data.password.length < 6) {
@@ -73,21 +66,13 @@ class SignUpScreen extends Component {
 
       if (errors.length === 0) {
         try {
-          userService.signUp(data).then(response => {
-            if (response.success) {
-              const { username, customerId } = response.data;
-              // const userInfo = {
-              //   token,
-              //   userId: customerId,
-              // };
-              // userActions.setInfoUser(userInfo);
-              // saveToken(token);
-              // saveUserId(customerId);
-              // userActions.fetchProfile(customerId);
-              // userActions.fetchAddress(customerId);
-              // cardsActions.fetchCards(customerId);
-              // navigation.navigate(Screens.ACTIVE);
+          userService.signUp(data)
+          .then(response => {
+            if (response.email) {
+              // console.log('signup',response)
               navigation.navigate(Screens.LOGIN);
+            }else if (response.message === 'Conflict') {
+              this.refs.toastFailed.show("Tài khoản đã tồn tại", DURATION.LENGTH_LONG);
             } else {
               this.refs.toastFailed.show(strings('Login.msgSignUpFailed'), DURATION.LENGTH_LONG);
             }
@@ -115,12 +100,11 @@ class SignUpScreen extends Component {
             <Block style={{marginVertical: 100}}>
               <Text error>{msgError}</Text>
               <Input
-                label={strings('Login.phoneNumber')}
+                label={"Email"}
                 error={hasErrors('username')}
                 style={[Style.input, hasErrors('username')]}
                 value={this.state.username}
                 onChangeText={(text) => this.setState({ username: text })}
-                number
                 labelColor ='white'
               />
               <Input
@@ -141,27 +125,6 @@ class SignUpScreen extends Component {
                 onChangeText={(text) => this.setState({ passwordConfirm: text })}
                 labelColor ='white'
               />
-              {/* <Block flex={false} row>
-                <Radio
-                  label={strings('UserInfo.male')}
-                  value="0"
-                  color={Colors.pink2}
-                  styleTitle={Style.radio}
-                  uncheckedColor={Colors.green}
-                  checked={gender === '0'}
-                  onPress={value => this.setState({ gender: value })}
-                  style={{ width : 100 }}
-                />
-                <Radio
-                  label={strings('UserInfo.female')}
-                  value="1"
-                  color={Colors.pink2}
-                  styleTitle={Style.radio}
-                  uncheckedColor={Colors.green}
-                  checked={gender === '1'}
-                  onPress={value => this.setState({ gender: value })}
-                />
-            </Block> */}
               <Button gradient onPress={() => this.handleLogin()}>
                 {loading ? (
                   <ActivityIndicator size="small" color="white" />

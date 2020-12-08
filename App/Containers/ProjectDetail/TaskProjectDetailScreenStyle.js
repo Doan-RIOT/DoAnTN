@@ -16,7 +16,6 @@ export default StyleSheet.create({
         width: null,
     },
     ItemEstimatesPhase: {
-        flexDirection: "row",
         backgroundColor: "#E7F8FD",
         borderRadius: 10,
         paddingVertical: 20,
@@ -65,12 +64,12 @@ export default StyleSheet.create({
         backgroundColor: Colors.white
     },
     input1: {
-        borderRadius: 0,
+        borderRadius: 5,
         borderWidth: 0,
         borderColor: Colors.gray2,
         borderWidth: 1,
         fontSize: 20,
-        color:"white"
+        color:Colors.catalinaBlue,
       },
       buttonImplement: {
         height: 60,
@@ -92,5 +91,50 @@ export default StyleSheet.create({
         },
         shadowOpacity: 0.25,
         elevation: 6,
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      },
+    modalView: {
+        width: width/2,
+        marginVertical:200,
+        backgroundColor: "white",
+        borderRadius: 20,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5
+      }, 
+      openButton: {
+        backgroundColor: "#F194FF",
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2
+      },
+      textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+      },
+      input2: {
+          width:200,
+        fontSize:20,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#D6D6D6",
+        borderRadius: 5,
+        marginTop: 5,
+        backgroundColor: Colors.white,
     },
 })

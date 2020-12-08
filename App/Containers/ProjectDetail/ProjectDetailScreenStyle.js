@@ -3,7 +3,7 @@ import { Sizes, Colors, ApplicationStyles } from '../../Theme';
 const { height, width } = Dimensions.get('window');
 export default StyleSheet.create({
     itemCarousel: {
-        width: width -50,
+        width: width -5,
         height: 220
     },
     carousel: {
@@ -49,7 +49,7 @@ export default StyleSheet.create({
     },
     bar: {
         height: height / 2,
-        marginBottom: 40,
+        marginBottom: 10,
     },
     backGroundImage: {
         height: height / 2,
@@ -63,7 +63,7 @@ export default StyleSheet.create({
         position: "absolute",
         alignSelf: "center",
         width: "100%",
-        top: height / 2 - 30,
+        top: height / 2 - 70,
     },
     renderItemSlidePhase: {
         paddingVertical: 10,
@@ -83,7 +83,7 @@ export default StyleSheet.create({
         marginTop: 10,
         paddingHorizontal: "4%",
         backgroundColor: Colors.white,
-        marginHorizontal: 20,
+        marginHorizontal: 5,
         paddingVertical: 10,
         shadowColor: "#00000029",
         shadowOffset: {
@@ -99,7 +99,7 @@ export default StyleSheet.create({
         borderWidth: 0.5,
     },
     statistical: {
-        marginHorizontal: 20,
+        marginHorizontal: 5,
         flexDirection: "column",
         marginTop: 10
     },
@@ -152,7 +152,7 @@ export default StyleSheet.create({
         elevation: 6,
     },
     renderContent: {
-        marginHorizontal: 20,
+        marginHorizontal: 5,
         flexDirection: "column",
     },
     ItemEstimatesProcess: {
@@ -182,7 +182,7 @@ export default StyleSheet.create({
     },
     totalCostOfPhase: {
         backgroundColor: "#26C165",
-        marginTop: 5,
+        marginVertical: 10,
         paddingVertical: 10,
         paddingHorizontal: 10,
         flexDirection: 'row',

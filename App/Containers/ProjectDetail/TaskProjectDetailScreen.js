@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated, } from 'react-native';
+import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated,Dimensions,Modal,TouchableHighlight } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Sizes, Colors, ApplicationStyles, Images } from '../../Theme';
 import { Screens } from '../../Utils/screens';
@@ -15,6 +15,7 @@ import * as scale from 'd3-scale';
 import ImagePicker from 'react-native-image-picker';
 import moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+const { height, width } = Dimensions.get('window');
 class TaskProjectDetailScreen extends Component {
   constructor(props) {
     super(props)
@@ -24,11 +25,29 @@ class TaskProjectDetailScreen extends Component {
       isDatePickerVisible: false,
       setDatePickerVisibility: false,
       dateStart: '',
-      avatarSource: ''
+      avatarSource: '',
+      endTask:0,
+      startTask:0,
+      dataTask: {},
+      modalVisible: false
     }
   }
   componentDidMount() {
+    const { params } = this.props.navigation.state;
+    this.setState({
+      endTask:params.endTask,
+      startTask:params.startTask,
+      dataTask:params.item
+    })
+  }
+  setModalVisible = (visible) => {
+    this.setState({ modalVisible: visible });
+  }
 
+  handleupdate (){
+    this.props.navigation.state.params.sayHello("hello")
+    console.log(this.props.navigation.state.params.sayHello)
+    console.log(this.props.navigation.state.params)
   }
   renderImagePicker = () => {
     const options = {
@@ -59,71 +78,155 @@ class TaskProjectDetailScreen extends Component {
     });
   }
   renderItemEstimatesCostPhase = (data) => {
+    var totalCost = 0;
+    const {dataTask} = this.state
+    for( var i=0; i< data.length; i++){
+      totalCost += data[i].quantity * data[i].unitPrice
+    }
+    totalCost += dataTask.workerNum*dataTask.workerUnitFee
     return (
       <Block flex={false} >
-        {data.map((item) =>
-          <Block key={item.id} center flex={false} style={styles.ItemEstimatesPhase}>
-            <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
-            <Block row style={{ justifyContent: 'space-between' }}>
-              <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
-                <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
-                <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
-              </Block>
-              <TextCurrency h3 semibold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice} />
-              <Icon
+        <Block flex={false} style={styles.ItemEstimatesPhase}>
+          <Block row center flex={false}>
+            <Block flex={false}><Image source={Images.worker} tintColor={Colors.green} style={{ resizeMode: "stretch", marginRight: 20, height:20,width:20 }}></Image></Block>
+            <Text h3 bold color={Colors.catalinaBlue}>Nhân công</Text>
+          </Block>
+          <Block row midle style={{ justifyContent: 'space-between',marginRight:40,paddingVertical:5 }}>
+            <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
+              <Text h3 bold color={Colors.catalinaBlue}>Dự toán</Text>
+              <Text h3 semibold color={Colors.catalinaBlue}>{dataTask.workerNum}x{dataTask.workerUnitFee}</Text>
+            </Block>
+            <Block row flex={false}>
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={dataTask.workerNum*dataTask.workerUnitFee}/>
+              <Text h4 bold color={Colors.catalinaBlue}>đ</Text>
+            </Block>        
+          </Block>
+          <Block row midle style={{ justifyContent: 'space-between',paddingVertical:5 }}>
+            <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
+              <Text h3 bold color={Colors.catalinaBlue}>Thực tế</Text>
+              <Text h3 semibold color={Colors.catalinaBlue}>{dataTask.workerNum}x{dataTask.workerUnitFee}</Text>
+            </Block>
+            <Block row flex={false}>
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={dataTask.workerNum*dataTask.workerUnitFee}/>
+              <Text h4 bold color={Colors.catalinaBlue}>đ</Text>
+            </Block>
+            <TouchableOpacity style={{backgroundColor:'#E7F8FD'}}
+                onPress={() => {
+                this.setModalVisible(true);
+              }}>
+                <Icon
                 style={{ marginLeft: 20 }}
                 name="edit"
                 size={20}
               />
+              </TouchableOpacity>         
+          </Block>
+        </Block>
+        {data.map((item,index) =>
+          <Block key={index}  flex={false} style={styles.ItemEstimatesPhase}>
+            <Block row center flex={false}>
+              <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
+              <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
+            </Block>
+            <Block row midle style={{ justifyContent: 'space-between', marginRight:40,paddingVertical:5 }}>
+              <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
+                <Text h3 bold color={Colors.catalinaBlue}>Dự toán:</Text>
+                <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
+              </Block>
+              <Block row flex={false}>
+                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice} />
+                <Text h4 bold color={Colors.catalinaBlue}>đ</Text>  
+              </Block>
+            </Block>
+            <Block row midle style={{ justifyContent: 'space-between',paddingVertical:5 }}>
+              <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
+                <Text h3 bold color={Colors.catalinaBlue}>Thực tế:</Text>
+                <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
+              </Block>
+              <Block row flex={false}>
+                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice} />
+                <Text h4 bold color={Colors.catalinaBlue}>đ</Text>  
+              </Block>
+              <TouchableOpacity style={{backgroundColor:'#E7F8FD'}}
+                onPress={() => {
+                this.setModalVisible(true);
+              }}>
+                <Icon
+                style={{ marginLeft: 20 }}
+                name="edit"
+                size={20}
+                />
+              </TouchableOpacity>
             </Block>
           </Block>
         )}
-        <Block flex={false} row right style={{ marginVertical: 10 }}>
-          <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.total')}: </Text>
-          <TextCurrency h3 bold color={Colors.catalinaBlue}>100 000 vnđ</TextCurrency>
+        <Block right flex={false} style={{width:width/2,}} >
+          <Block flex={false} row style={{ marginVertical: 10 }}>
+            <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.total')}: </Text>
+          </Block>
+          <Block flex={false} row style={{ marginVertical: 10 }}>
+            <Text h3 bold color={Colors.catalinaBlue}>Dự toán: </Text>
+            <TextCurrency h3 bold color={Colors.catalinaBlue} value={totalCost}/>
+            <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
+          </Block>
+          <Block flex={false} row style={{ marginVertical: 10 }}>
+            <Text h3 bold color={Colors.catalinaBlue}>Thực tế: </Text>
+            <TextCurrency h3 bold color={Colors.catalinaBlue} value={totalCost}/>
+            <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
+          </Block>
         </Block>
       </Block>
     )
   }
-  renderEstimatesCostTask = () => {
-    const dataEstimatesProcess = [{ "id": 1, "name": "Phân NPK", "quantity": 50, "unitPrice": "50000" }, { "id": 2, "name": "Phân Quế lâm", "quantity": 50, "unitPrice": "50000" }, { "id": 3, "name": "Đạm", "quantity": 50, "unitPrice": "50000" }]
+  renderEstimatesCostTask = (materials) => {
+    console.log('dataTask',materials)
     return (
       <Block flex={false}>
-        {this.renderItemEstimatesCostPhase(dataEstimatesProcess)}
+        {materials? this.renderItemEstimatesCostPhase(materials):null}
       </Block>
     )
   }
   renderItemSLDD = (data) => {
     return (
       <Block flex={false} >
-        {data.map((item) =>
-          <Block key={item.id} flex={false} style={styles.ItemSLDDD}>
+        {data.map((item,index) =>
+          <Block key={index} flex={false} style={styles.ItemSLDDD}>
             <Block row flex={false}>
               <Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image>
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
             </Block>
             <Block flex={false} style={{ paddingVertical: 10 }}>
-              <Text h3 color={Colors.catalinaBlue}>Hướng dẫn đo : {item.sldd}</Text>
+              <Text h3 bold color={Colors.catalinaBlue}>Hướng dẫn đo: </Text>
+              <Text h3 color={Colors.catalinaBlue}>
+                {item.guide}
+              </Text>
             </Block>
             <Block flex={false} row flex={false}>
               <Block style={{marginRight:5}}>
                 <Input
-                  label={"Sô liệu chuẩn"}
-                  // error={hasErrors('username')}
+                  editable={false}
+                  label={"Sô liệu chuẩn:"}
+                  labelStyle={{ color: Colors.catalinaBlue, fontSize: 18,fontWeight: 'bold' }}
                   style={[styles.input1]}
-                  value={this.state.username}
+                  value={item.standardNum.toString()}
                   // onChangeText={(text) => this.setState({ username: text })}
                   labelColor={Colors.catalinaBlue}
+                  rightLabel={
+                    <Text h3 color={Colors.catalinaBlue} style={{marginTop:35,position: 'absolute',}}>{item.unit}</Text>
+                  }
                 />
               </Block>
               <Block style={{marginRight:5}}>
                 <Input
-                  label={"Sô liệu thực tế"}
-                  // error={hasErrors('username')}
+                  label={"Sô liệu thực tế:"}
+                  labelStyle={{ color: Colors.catalinaBlue, fontSize: 18,fontWeight: 'bold' }}
                   style={[styles.input1]}
-                  value={this.state.username}
+                  value={item.standardNum.toString()}
                   // onChangeText={(text) => this.setState({ username: text })}
                   labelColor={Colors.catalinaBlue}
+                  rightLabel={
+                    <Text h3 color={Colors.catalinaBlue} style={{marginTop:35,position: 'absolute',}}>{item.unit}</Text>
+                  }
                 />
               </Block>
             </Block>
@@ -132,37 +235,38 @@ class TaskProjectDetailScreen extends Component {
       </Block>
     )
   }
-  renderSLDD = () => {
-    const dataEstimatesProcess = [{ "id": 1, "name": "Ph đất", "sldd": 50, "sltt": "50000" }, { "id": 2, "name": "Phèn", "sldd": 50, "sltt": "50000" }, { "id": 3, "name": "Đạm", "sldd": 50, "sltt": "50000" }]
+  renderSLDD = (measurements) => {
     return (
       <Block flex={false}>
-        {this.renderItemSLDD(dataEstimatesProcess)}
+        {this.renderItemSLDD(measurements)}
       </Block>
     )
   }
   render() {
     const { navigation } = this.props;
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
-    // const headerHeight = diffClamp.interpolate({
-    //   inputRange: [0, 55],
-    //   outputRange: [55, 0],
-    //   extrapolate: 'clamp',
-    // });
+    let {endTask,startTask,dataTask} = this.state
+    let materials = [];
+    let measurements = [];
+    if(dataTask&&dataTask.length!==0){
+    materials = dataTask.materials;
+    measurements = dataTask.measurements;
+    }
     const headerTranslate = diffClamp.interpolate({
       inputRange: [0, 45],
       outputRange: [0, -60],
       extrapolate: 'clamp',
     });
-    const data = { "summaryQT": { "LoiNhuan": "30000000", "QuyMo": "200", "SanLuong": "300", "TenQuyTrinh": "Trồng lúa Organic", "chiPhiDauTu": "100000000", "thoiGianThucHien": "3" } }
+    const { modalVisible } = this.state;
     return (
       <Block style={{ backgroundColor: "#B8F39A" }}>
         <Block flex={false} style={styles.estimatesTime}>
           <Block row center style={{}}>
-            <Text bold h2>Ngày bắt đầu : 12/10/2020</Text>
+            <Text bold h2>Ngày bắt đầu: {moment(startTask).format('DD/MM/YYYY')}</Text>
           </Block>
           <Block flex={false} style={styles.line}></Block>
           <Block row center>
-            <Text flex={false} bold h2>Ngày kết thúc : 12/11/2020</Text>
+            <Text flex={false} bold h2>Ngày kết thúc: {moment(endTask).format('DD/MM/YYYY')}</Text>
             <TouchableOpacity>
               <Icon
                 style={{ marginLeft: 20 }}
@@ -182,26 +286,30 @@ class TaskProjectDetailScreen extends Component {
               <Text h1 bold>Công việc</Text>
             </Block>
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Mô tả</Text>
-              <Text h3>Làm đất</Text>
+              <Text h3 bold style={{ marginVertical: 10 }}>Mô tả: </Text>
+              <Text h3>{dataTask.description}</Text>
             </Block>
+            {materials && materials.length !== 0 ? 
+              <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
+                <Text h3 bold style={{ marginVertical: 10 }}>Nguyên vât liệu: </Text>
+                {this.renderEstimatesCostTask(materials)}
+              </Block>
+            :null}
+            {measurements && measurements.length !== 0 ? 
+              <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
+                <Text h3 bold style={{ marginVertical: 10 }}>Số liệu đo đạc: </Text>
+                {this.renderSLDD(measurements)}
+              </Block>
+            :null}
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Nguyên vât liệu</Text>
-              {this.renderEstimatesCostTask()}
-            </Block>
-            <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Số liệu đo đạc</Text>
-              {this.renderSLDD()}
-            </Block>
-            <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Mo tả tình trạng</Text>
+              <Text h3 bold style={{ marginVertical: 10 }}>Mô tả tình trạng: </Text>
               <Input
                 style={[styles.input,]}
               />
             </Block>
             <Block flex={false} style={{ marginTop: 20, marginHorizontal: 20 }}>
               <Block row flex={false} style={{ justifyContent: 'space-between' }}>
-                <Text h3 bold>Cập nhật hình ảnh</Text>
+                <Text h3 bold>Cập nhật hình ảnh: </Text>
                 <TouchableOpacity
                   onPress={() => this.renderImagePicker()}
                 >
@@ -222,10 +330,46 @@ class TaskProjectDetailScreen extends Component {
           >
           </Header>
         </Animated.View>
-        <TouchableOpacity style={styles.buttonImplement}>
+        <TouchableOpacity style={styles.buttonImplement}
+           onPress={() => this.handleupdate()}
+        >
+              
           <Text h3 bold color={Colors.white}>Cập</Text>
           <Text h3 bold color={Colors.white}>nhật</Text>
         </TouchableOpacity>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+          }}
+        >
+          <Block style={styles.centeredView}>
+            <Block style={styles.modalView}>
+            <Input
+              label={'Số lượng'}
+              style={[styles.input2,]}
+              // onChangeText={text => this.handleChange(text, 'scale')}
+              number
+            />
+            <Input
+              label={'Đơn giá'}
+              style={[styles.input2,]}
+              // onChangeText={text => this.handleChange(text, 'scale')}
+              number
+            />
+              <TouchableHighlight
+                style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                onPress={() => {
+                  this.setModalVisible(!modalVisible);
+                }}
+              >
+                <Text style={styles.textStyle}>Thoát</Text>
+              </TouchableHighlight>
+            </Block>
+          </Block>
+        </Modal>
       </Block>
     )
   }

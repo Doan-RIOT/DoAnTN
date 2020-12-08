@@ -15,6 +15,7 @@ import * as scale from 'd3-scale';
 import ImagePicker from 'react-native-image-picker';
 import moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { Config } from '../../Config';
 class TaskDetailScreen extends Component {
   constructor(props) {
     super(props)
@@ -62,21 +63,38 @@ class TaskDetailScreen extends Component {
   }
   renderItemEstimatesCostPhase = (data) => {
     var totalCost = 0;
+    const {dataTask} = this.state
     for( var i=0; i< data.length; i++){
       totalCost += data[i].quantity * data[i].unitPrice
     }
+    totalCost += dataTask.workerNum*dataTask.workerUnitFee
     return (
       <Block flex={false} >
+        <Block center flex={false} style={styles.ItemEstimatesPhase}>
+          <Block flex={false}><Image source={Images.worker} tintColor={Colors.green} style={{ resizeMode: "stretch", marginRight: 20, height:20,width:20 }}></Image></Block>
+          <Block row style={{ justifyContent: 'space-between' }}>
+            <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
+              <Text h3 bold color={Colors.catalinaBlue}>Nhân công</Text>
+              <Text h3 semibold color={Colors.catalinaBlue}>{dataTask.workerNum}x{dataTask.workerUnitFee}</Text>
+            </Block>
+            <Block row flex={false}>
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={dataTask.workerNum*dataTask.workerUnitFee}/>
+              <Text h4 bold color={Colors.catalinaBlue}>đ</Text>
+            </Block>           
+          </Block>
+        </Block>
         {data.map((item) =>
-          <Block key={item.id} center flex={false} style={styles.ItemEstimatesPhase}>
+          <Block key={item._id} center flex={false} style={styles.ItemEstimatesPhase}>
             <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
             <Block row style={{ justifyContent: 'space-between' }}>
               <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
                 <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
               </Block>
-              <TextCurrency h3 semibold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice} />
-              
+              <Block row flex={false}>
+                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice} />
+                <Text h4 bold color={Colors.catalinaBlue}>đ</Text>  
+              </Block>            
             </Block>
           </Block>
         )}
@@ -105,23 +123,29 @@ class TaskDetailScreen extends Component {
       <Block flex={false} >
         {data.map((item) =>
           <Block key={item.id} flex={false} style={styles.ItemSLDDD}>
-            <Block row flex={false}>
+            <Block center row flex={false}>
               <Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image>
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
             </Block>
             <Block flex={false} style={{ paddingVertical: 10 }}>
-              <Text h3 color={Colors.catalinaBlue}>Hướng dẫn đo: {item.sldd}</Text>
+              <Text h3 bold color={Colors.catalinaBlue}>Hướng dẫn đo: </Text>
+              <Text h3 color={Colors.catalinaBlue}>
+                {item.guide}
+              </Text>
             </Block>
             <Block flex={false} row flex={false}>
               <Block style={{marginRight:5}}>
                 <Input
                   editable={false}
-                  label={"Sô liệu chuẩn"}
-                  // error={hasErrors('username')}
+                  label={"Sô liệu chuẩn:"}
+                  labelStyle={{ color: Colors.catalinaBlue, fontSize: 18,fontWeight: 'bold' }}
                   style={[styles.input1]}
-                  value={this.state.username}
+                  value={item.standardNum.toString()}
                   // onChangeText={(text) => this.setState({ username: text })}
                   labelColor={Colors.catalinaBlue}
+                  rightLabel={
+                    <Text h3 color={Colors.catalinaBlue} style={{marginTop:35,position: 'absolute',}}>{item.unit}</Text>
+                  }
                 />
               </Block>
             </Block>
@@ -130,11 +154,10 @@ class TaskDetailScreen extends Component {
       </Block>
     )
   }
-  renderSLDD = () => {
-    const dataEstimatesProcess = [{ "id": 1, "name": "Ph đất", "sldd": 50, "sltt": "50000" }, { "id": 2, "name": "Phèn", "sldd": 50, "sltt": "50000" }, { "id": 3, "name": "Đạm", "sldd": 50, "sltt": "50000" }]
+  renderSLDD = (data) => {
     return (
       <Block flex={false}>
-        {this.renderItemSLDD(dataEstimatesProcess)}
+        {this.renderItemSLDD(data)}
       </Block>
     )
   }
@@ -144,7 +167,6 @@ class TaskDetailScreen extends Component {
     const { item,summaryProcess } = this.props.navigation.state.params;
     const data = item;
     const params = summaryProcess
-    console.log("1",summaryProcess)
     const headerTranslate = diffClamp.interpolate({
       inputRange: [0, 45],
       outputRange: [0, -60],
@@ -163,8 +185,8 @@ class TaskDetailScreen extends Component {
           )}
         >
           <Block style={styles.taskContent}>
-            <Block center midle flex={false}>
-              <Text h1 bold>{data.name}</Text>
+            <Block center midle flex={false} style={{paddingHorizontal:30}}>
+              <Text h2 bold>{data.name}</Text>
             </Block>
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
               <Text h3 bold style={{ marginVertical: 10 }}>Mô tả công việc:</Text>
@@ -174,16 +196,12 @@ class TaskDetailScreen extends Component {
               <Text h3 bold style={{ marginVertical: 10 }}>Nguyên vât liệu:</Text>
               {this.renderEstimatesCostTask()}
             </Block>
-            <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
+            {data.measurements && data.measurements.length !== 0 ? 
+            (<Block midle flex={false} style={{ paddingHorizontal: 20 }}>
               <Text h3 bold style={{ marginVertical: 10 }}>Số liệu đo đạc:</Text>
-              {this.renderSLDD()}
-            </Block>
-            <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Mo tả tình trạng</Text>
-              <Input
-                style={[styles.input,]}
-              />
-            </Block>
+              {this.renderSLDD(data.measurements)}
+            </Block> )
+            :null}
             <Block flex={false} style={{ marginTop: 20, marginHorizontal: 20 }}>
               <Block row flex={false} style={{ justifyContent: 'space-between' }}>
                 <Text h3 bold>Hình ảnh</Text>

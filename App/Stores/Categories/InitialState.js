@@ -7,4 +7,5 @@ export const INITIAL_STATE = {
   loadingCategory: false,
   loadingProductsCategory: false,
   errorMessage: null,
+  ListProjectFinished : {}
 }

@@ -44,8 +44,7 @@ export default StyleSheet.create({
     borderWidth: 0.5,
   },
   scrollView: {
-    width: "100%",
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     marginBottom:50
   },
   header: {

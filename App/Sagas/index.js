@@ -12,9 +12,9 @@ import {
   fetchCategoriesBranch
 } from './BranchSaga';
 import { CategoriesTypes } from '../Stores/Categories/Actions';
-import { fetchProductsByCategory, fetchParentCategory } from './CategoriesSaga'
+import { fetchProductsByCategory, fetchParentCategory, fetchProjectFinished } from './CategoriesSaga'
 import { CardsTypes } from '../Stores/Card/Actions';
-import { fetchCards } from './CardsSaga';
+import { fetchCards,fetchProject } from './CardsSaga';
 
 import { ProcessTypes } from '../Stores/Process/Actions';
 import { fetchProcess, fetchProcessDetail,fetchListProcess } from './ProcessSaga';
@@ -38,9 +38,11 @@ export default function* root() {
     takeLatest(BranchTypes.FETCH_CATEGORIES_BRANCH, fetchCategoriesBranch),
     takeLatest(CategoriesTypes.FETCH_PRODUCTS_BY_CATEGORY, fetchProductsByCategory),
     takeLatest(CategoriesTypes.FETCH_PARENT_CATEGORY, fetchParentCategory),
+    takeLatest(CategoriesTypes.FETCH_PROJECT_FINISHED,fetchProjectFinished),
     takeLatest(CardsTypes.FETCH_CARDS, fetchCards),
+    takeLatest(CardsTypes.FETCH_PROJECT, fetchProject),
     takeLatest(ProcessTypes.FETCH_PROCESS, fetchProcess),
     takeLatest(ProcessTypes.FETCH_PROCESS_DETAIL, fetchProcessDetail),
-    takeLatest(ProcessTypes.FETCH_LIST_PROCESS,fetchListProcess)
+    takeLatest(ProcessTypes.FETCH_LIST_PROCESS,fetchListProcess),
   ])
 }

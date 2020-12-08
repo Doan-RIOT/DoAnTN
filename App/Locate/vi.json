@@ -64,7 +64,7 @@
     "loading": "Vui lòng đợi..."
   },
   "Categories": {
-    "categories" : "Danh mục",
+    "categories" : "Dự án đã hoàn thành",
     "all": "TẤT CẢ",
     "anotherLocation": "địa điểm khác"
   },
@@ -327,6 +327,7 @@
     "time": "Thời gian",
     "cost": "Chi phí",
     "task": "Công việc",
+    "phase": "Giai đoạn",
     "detail": "chi tiết",
     "questions": "Các câu hỏi thường gặp",
     "implement": "Triển khai",
@@ -353,10 +354,22 @@
     "supply": "Cung",
     "demand": "Cầu",
     "market": "Thị trường",
-    "warn": "Cảnh báo"
+    "warn": "Cảnh báo",
+    "dailyTask":"Công việc hằng ngày"
   },
   "Project":{
     "project":"Dự án",
-    "projecPlan":"Dự án đang triển khai"
+    "projecPlan":"Dự án đang triển khai",
+    "addTask":"Thêm công việc",
+    "nameTask":"Tên công việc",
+    "description":"Mô tả công việc",
+    "estimatedTime":"Thơi gian ước tính",
+    "estimatedTimeUnit":"Đơn vị thơi gian",
+    "workerNum":"Nhân công",
+    "workerUnitFee": "Đơn giá nhân công",
+    "dailyTask": "Công việc hằng ngày",
+    "task": "Công việc",
+    "msgErrorRequiredName":"Nhập tên công việc",
+    "msgErrorRequiredDescription":"Nhập mô tả công việc"
   }
 }

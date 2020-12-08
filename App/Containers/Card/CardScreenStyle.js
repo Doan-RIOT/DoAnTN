@@ -5,13 +5,6 @@ export default StyleSheet.create({
   view: {
     ...ApplicationStyles.backgroundView,
   },
-  container: {
-    ...ApplicationStyles.marginHorizontal,
-    ...ApplicationStyles.marginTop10,
-    ...ApplicationStyles.borderRadiusItem,
-    ...ApplicationStyles.backgroundItem,
-    ...ApplicationStyles.padding,
-  },
   cartIcon: {
     color: Colors.white,
   },
@@ -26,7 +19,7 @@ export default StyleSheet.create({
   container: {
     borderRadius: 9,
     alignItems: 'center',
-    height: 450,
+    // height: 450,
     flexDirection: 'column',
     marginVertical: 10,
     marginHorizontal: 5,
@@ -35,6 +28,7 @@ export default StyleSheet.create({
     shadowOffset: { width: 0, height: 3, },
     shadowOpacity: 0.27,
     shadowRadius: 4.65, elevation: 6,
+    paddingBottom:5
   },
   image: {
     height: height / 3,
@@ -56,7 +50,7 @@ export default StyleSheet.create({
   },
   timePlan: {
     marginTop: 10,
-    width: width - 80,
+    paddingHorizontal:10,
     height: height / 13,
     borderColor: "#2AD16E",
     borderWidth: 1,
@@ -66,8 +60,7 @@ export default StyleSheet.create({
 
   },
   statistical: {
-    width: width - 30,
-    height: height / 5,
+    paddingHorizontal:10,
     marginTop: 80,
   },
   header: {
@@ -97,5 +90,9 @@ export default StyleSheet.create({
     },
     shadowOpacity: 0.25,
     elevation: 5,
+  },
+  line: {
+    borderColor: "#707070",
+    borderWidth: 0.5,
   },
 })

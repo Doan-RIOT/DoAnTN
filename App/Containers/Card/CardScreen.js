@@ -19,6 +19,7 @@ import { resetUser } from '../../Utils/storage.helper';
 import { Config } from '../../Config/index';
 import { Screens } from '../../Utils/screens';
 import { Constants } from '../../Utils/constants';
+import moment from 'moment';
 
 class CardScreen extends Component {
   constructor(props) {
@@ -29,49 +30,45 @@ class CardScreen extends Component {
       card: [1, 2, 3, 4],
       cards: {},
       typeCode: 'barCode',
-      Projects: [],
       scrollY: new Animated.Value(0),
+      listProject:[]
     }
   }
   componentDidMount() {
-    const url = 'https://gist.githubusercontent.com/Doan-RIOT/f5bbefa21f108bcfd99044b979a7ae90/raw/8bb3e9348ca5ad4d6987c7fffcb222838c3d0c70/data.json';
-    return fetch(url)
-      .then((response) => response.json())
-      .then((responseJson) => {
-        // console.log(responseJson.book_array)
-        this.setState({ Projects: responseJson.book_array })
-      })
-      .catch((error) => {
-        console.error(error);
-      })
+    //API redux
+    const { cardsActions,project } = this.props
+    cardsActions.fetchProject();
+    // console.log('ListProject',project)
+    // this.setState({ listProject : project})
   }
-  static getDerivedStateFromProps(nextProps, prevState) {
-    const { errorCode, cards } = nextProps;
-    const data = { errorCode, cards };
-    return data;
+  UNSAFE_componentWillUpdate (nextProps) {
+    const {project}=this.props
+    if(nextProps.project!==project){
+      this.setState({listProject:nextProps.project})
+    }
   }
-
-  onRefresh = () => {
-    const { cardsActions, userId } = this.props;
-    cardsActions.fetchCards(userId);
-  };
   renderItemProject(item) {
     const { navigation } = this.props;
+    var image = item.images[0]
+    var url = Config.API_URL
+    if(image){
+      image=image.replace("http://localhost:3000",url)
+    }
     return (
-      <TouchableOpacity style={styles.container}
+      <TouchableOpacity key={item._id} style={styles.container}
       onPress={() => navigation.navigate(Screens.PROJECT, item)}
       >
-        <Image style={styles.image} source={{ uri: item.image }} />
+        <Image style={styles.image} source={{ uri: image?image:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1778&q=80" }} />
         <Block style={styles.summary}>
-          <Text h1 >{item.summaryQT.TenQuyTrinh} </Text>
+          <Text h2 >{item.name} </Text>
           <Block row flex={false} style={styles.timePlan}>
             <Block center>
               <Text h3 bold>Bắt đầu</Text>
-              <Text h3 bold>12/08/2020</Text>
+              <Text h3 bold>{moment(item.planStartDate).format('DD/MM/YYYY')}</Text>
             </Block>
             <Block center>
               <Text h3 bold>Kết thúc</Text>
-              <Text h3 bold>12/08/2020</Text>
+              <Text h3 bold>{moment(item.planStartDate+(item.estimatedTime*30*24*60*60*1000)).format('DD/MM/YYYY')}</Text>
             </Block>
           </Block>
           <Block flex={false} style={styles.progress}>
@@ -80,56 +77,46 @@ class CardScreen extends Component {
           </Block>
         </Block>
         <Block flex={false} row style={styles.statistical}>
-          <Block color={"#B8CEC9"} style={{ marginRight: 2, borderRadius: 5, paddingRight: 5}}>
+          <Block  color={"#B8CEC9"} style={{ borderRadius: 5,paddingHorizontal:20}}>
             <Block center middle flex={false} >
-              <Text h3 bold>Dự toán</Text>
+              <Text h2 bold color={Colors.catalinaBlue}>Dự toán</Text>
             </Block>
             <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image style={{marginLeft: 5 }} source={Images.invest}></Image>
+              <Image style={{marginLeft: 5 }} source={Images.iconLand}></Image>
               <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
-                <Text h3>Đầu tư</Text>
-                <Text h3>200</Text>
+                <Text h3 bold color={Colors.catalinaBlue}> Quy mô</Text>
+                <Text h3 bold color={Colors.catalinaBlue}>{item.minimalScale} {item.standardUnit}</Text>
               </Block>
             </Block>
+            <Block flex={false} style={styles.line}></Block>
             <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image style={{marginLeft: 5 }} source={Images.quantity}></Image>
+              <Image style={{marginLeft: 5 }} source={Images.iconSanLuong}></Image>
               <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
-                <Text h3>Lợi nhuận</Text>
-                <Text h3>200</Text>
+                <Text h3 bold color={Colors.catalinaBlue}> Chi phí</Text>
+                <Block row flex={false} >
+                  <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.estimatedCost} />
+                  <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
+                </Block>
               </Block>
             </Block>
+            <Block flex={false} style={styles.line}></Block>
             <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image source={Images.profit}></Image>
+              <Image style={{marginLeft: 5 }} source={Images.iconInvest}></Image>
               <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
-                <Text h3>Sản lượng</Text>
-                <Text h3>200</Text>
+                <Text h3 bold color={Colors.catalinaBlue}>Sản lượng</Text>
+                <Text h3 bold color={Colors.catalinaBlue}>{item.estimatedQuantity} kg</Text>
               </Block>
             </Block>
-          </Block>
-          <Block color={'#FEC868'} style={{ marginRight: 2, borderRadius: 5,paddingRight: 5 }}>
-            <Block center middle flex={false} >
-              <Text h3 bold>Thực tế</Text>
-              <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image style={{marginLeft: 5 }} source={Images.invest}></Image>
-              <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
-                <Text h3>Đầu tư</Text>
-                <Text h3>200</Text>
-              </Block>
-            </Block>
+            <Block flex={false} style={styles.line}></Block>
             <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image style={{marginLeft: 5 }} source={Images.quantity}></Image>
+              <Image source={Images.iconMoney}></Image>
               <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
-                <Text h3>Sản lượng</Text>
-                <Text h3>200</Text>
+                <Text h3 bold color={Colors.catalinaBlue}>Lợi nhuận</Text>
+                <Block row flex={false} >
+                  <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.unitPrice * item.estimatedQuantity - item.estimatedCost } />
+                  <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
+                </Block>
               </Block>
-            </Block>
-            <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image source={Images.profit}></Image>
-              <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
-                <Text h3>Lợi nhuận</Text>
-                <Text h3>200</Text>
-              </Block>
-            </Block>
             </Block>
           </Block>
         </Block>
@@ -137,7 +124,7 @@ class CardScreen extends Component {
     );
   }
   renderProject() {
-    const data = this.state.Projects;
+    const data = this.state.listProject;
     return (
       <Block center style={{ marginTop: 60 }}>
         {data.map((item) => this.renderItemProject(item))}
@@ -178,7 +165,7 @@ class CardScreen extends Component {
     this.setState({
       Index
     });
-    console.log(this.state.Index)
+    // console.log(this.state.Index)
   }
   render() {
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
@@ -219,6 +206,7 @@ const mapStateToProps = (state) => ({
   cards: state.cards.cards,
   userId: state.user.userId,
   errorCode: state.user.errorCode,
+  project: state.cards.ListProject
 })
 
 const mapDispatchToProps = (dispatch) => ({

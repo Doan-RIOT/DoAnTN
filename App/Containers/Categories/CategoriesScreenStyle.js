@@ -1,8 +1,6 @@
-import { StyleSheet, Dimensions } from 'react-native';
-import { Sizes, Colors } from '../../Theme';
-import { ApplicationStyles } from '../../Theme';
+import { StyleSheet, Dimensions } from 'react-native'
+import { Sizes, Colors, ApplicationStyles } from '../../Theme';
 const { height, width } = Dimensions.get('window');
-
 export default StyleSheet.create({
   view: {
     ...ApplicationStyles.backgroundView,
@@ -14,134 +12,94 @@ export default StyleSheet.create({
     ...ApplicationStyles.backgroundItem,
     ...ApplicationStyles.padding,
   },
-  address: {
-    ...ApplicationStyles.marginHorizontal,
-    marginTop: 5,
-  },
-  search: {
-    borderRadius: 12,
-    borderColor: Colors.white,
-    backgroundColor: Colors.white,
-    height: Sizes.base * 2.5,
-  },
-  searchIcon: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    color: Colors.gray
-  },
   cartIcon: {
     color: Colors.white,
   },
-  pickerStyle: {
-    maxHeight: height / 2,
+  points: {
+    color: Colors.green,
+    fontSize: 30,
   },
-  itemCarousel: {
+  card: {
     width: '100%',
-    height: 150,
+    height: 200
   },
-  sortType: {
-    position: 'absolute', 
-    zIndex: 99999,
-    width: width,
-    shadowColor: Colors.gray, 
+  container: {
+    borderRadius: 9,
+    alignItems: 'center',
+    // height: 450,
+    flexDirection: 'column',
+    marginVertical: 10,
+    marginHorizontal: 5,
+    backgroundColor: '#E4E4E4',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3, },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65, elevation: 6,
+    paddingBottom:5
+  },
+  image: {
+    height: height / 3,
+    width: width - 20,
+    resizeMode: 'stretch',
+    borderTopLeftRadius: 9,
+    borderTopRightRadius: 9
+  },
+  summary: {
+    opacity: 0.90,
+    height: height / 4 + 40,
+    width: width - 30,
+    position: 'absolute',
+    borderTopLeftRadius: 9,
+    borderTopRightRadius: 9,
+    marginTop: height / 3 - 100,
+    backgroundColor: '#BEF4A3',
+    paddingHorizontal: 5
+  },
+  timePlan: {
+    marginTop: 10,
+    paddingHorizontal:10,
+    height: height / 13,
+    borderColor: "#2AD16E",
+    borderWidth: 1,
+    alignSelf: "center"
+  },
+  progress: {
+
+  },
+  statistical: {
+    paddingHorizontal:10,
+    marginTop: 80,
+  },
+  header: {
+    backgroundColor: "#0A9F9E",
+    flexDirection: "row",
+    height: 60,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    width: null,
+  },
+  slidePhase: {
+    position: "absolute",
+    alignSelf: "center",
+    width: "100%",
+    top: height / 2 - 30,
+  },
+  renderItemSlidePhase: {
+    paddingVertical: 10,
+    width: 115,
+    borderRadius: 10,
+    shadowColor: "#00000029",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
     elevation: 5,
-    backgroundColor: Colors.white,
-    ...ApplicationStyles.borderRadiusItem,
-    ...ApplicationStyles.padding,
-    maxHeight: height / 2,
   },
-  branch: {
-    width: width * 0.42,
-    height: width * 0.42,
-  },
-  backgroundTypeSort: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'gray',
-    zIndex: 99,
-    opacity: 0.5,
-  },
-  touchOut: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  branchImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 100 / 2,
-  },
-  productImage: {
-    width: width * 0.42,
-    height: width * 0.42,
-  },
-  button: {
-    width: 30,
-    height: 30,
-    marginTop: 0,
-    marginBottom: 5,
-  },
-  itemBranch: {
-    padding: 10,
-    borderBottomColor: Colors.gray3,
-    borderBottomWidth: 0.5,
-  },
-  categories: {
-    backgroundColor: Colors.green2,
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    borderRadius: 5
-  },
-  categoriesSelect: {
-    borderColor: Colors.green,
-    borderWidth: 1,
-  },
-  categoryImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 70 / 2,
-    borderColor: Colors.green,
-    borderWidth: 0.5
-  },
-  input: {
-    ...ApplicationStyles.input,
-  },
-  buttonAddNumber: {
-    minWidth: 25,
-    height: 30,
-    borderColor: Colors.gray,
+  line: {
+    borderColor: "#707070",
     borderWidth: 0.5,
-    borderRadius: 0
   },
-  buttonBuyNow: {
-    minWidth: 105,
-    height: 35,
-    borderColor: Colors.gray,
-    borderWidth: 0.5,
-    borderRadius: 5,
-    backgroundColor:Colors.red,
-  },
-  loading: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    opacity: 0.5,
-    alignItems: 'center',
-    backgroundColor: 'black',
-    justifyContent: 'center'
-  }
 })

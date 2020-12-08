@@ -28,6 +28,11 @@ export const fetchCardsFailure = (state, { errorMessage }) => ({
   errorMessage,
 })
 
+export const fetchProjectSuccess = (state,{ListProject}) => ({
+  ...state,
+  ListProject,
+}) 
+
 /**
  * @see https://github.com/infinitered/reduxsauce#createreducer
  */
@@ -35,4 +40,5 @@ export const reducer = createReducer(INITIAL_STATE, {
   [CardsTypes.FETCH_CARDS_LOADING]: fetchCardsLoading,
   [CardsTypes.FETCH_CARDS_SUCCESS]: fetchCardsSuccess,
   [CardsTypes.FETCH_CARDS_FAILURE]: fetchCardsFailure,
+  [CardsTypes.FETCH_PROJECT_SUCCESS]: fetchProjectSuccess,
 })

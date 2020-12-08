@@ -43,6 +43,7 @@ import ProcessImplementScreen from '../Containers/ProcessDetail/ProcessImplement
 import TaskDetailScreen from '../Containers/ProcessDetail/TaskDetailScreen';
 import ProjectDetailScreen from '../Containers/ProjectDetail/ProjectDetailScreen';
 import TaskProjectDetailScreen from '../Containers/ProjectDetail/TaskProjectDetailScreen';
+import AddTaskScreen from '../Containers/ProjectDetail/AddTaskScreen';
 /**
  * The root screen contains the application's navigation.
  *
@@ -124,12 +125,6 @@ const bottomTabNavigator = createBottomTabNavigator({
       title: strings('Home.home'),
     },
   },
-  // [Screens.CATEGORIES]: {
-  //   screen: CategoriesStackNavigator,
-  //   navigationOptions: {
-  //     title: strings('Categories.categories'),
-  //   },
-  // },
   [Screens.CARD]: {
     screen: CardStackNavigator,
     navigationOptions: {
@@ -141,6 +136,12 @@ const bottomTabNavigator = createBottomTabNavigator({
           </Block>
         );
       }
+    },
+  },
+  [Screens.CATEGORIES]: {
+    screen: CategoriesStackNavigator,
+    navigationOptions: {
+      title: strings('Categories.categories'),
     },
   },
   // [Screens.FAVORITES]: {
@@ -161,10 +162,7 @@ const bottomTabNavigator = createBottomTabNavigator({
       tabBarIcon: ({ focused, horizontal, tintColor }) => {
         return (
           <Block flex={false}>
-            <Icon name='user' size={22} color={tintColor} />
-            {/* <Badge
-              style={{ position: 'absolute', top: -4, left: 9 }}
-            >0</Badge> */}
+            <Image source={Images.worker} style={{tintColor,height:25,width:25}} />
           </Block>
         );
       }
@@ -204,6 +202,7 @@ const rootStackNavigator = createStackNavigator(
     [Screens.PROCESS_DETAIL]: ProcessDetailScreen,
     [Screens.PROCESS_IMPLEMENT]: ProcessImplementScreen,
     [Screens.TASK]: TaskDetailScreen,
+    [Screens.ADD_TASK]: AddTaskScreen,
     [Screens.PROJECT]: ProjectDetailScreen,
     [Screens.TASK_PROJECT]:TaskProjectDetailScreen,
     [Screens.IMAGE_COMMENTS]: ImageCommentsScreen,

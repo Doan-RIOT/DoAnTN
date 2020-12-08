@@ -80,9 +80,8 @@ class ProcessDetailScreen extends Component {
     }else{
       data = carousel
     }
-
     return (
-      <Block flex={false} style={{ ...ApplicationStyles.marginHorizontal, marginTop: 2 }}>
+      <Block flex={false} style={{ marginHorizontal:10, marginTop: 2 }}>
         <Carousel
           data={data}
           renderItem={this.renderItemCarousel}
@@ -101,7 +100,7 @@ class ProcessDetailScreen extends Component {
     const {phases} = this.state.ProcessDetail
     if(phases){
       for(var i=0; i < phases.length; i++){
-        process.push(`Giai đoạn${i+1}`);
+        process.push(`${strings('Process.phase')} ${i+1}`);
       }
     }
     const summaryProcess = summary.concat(process);
@@ -139,7 +138,7 @@ class ProcessDetailScreen extends Component {
   }
   renderItemQuestion = (item) => {
     return (
-      <Block  flex={false} style={{ paddingHorizontal: 17, backgroundColor: "#E7F8FD", borderRadius: 10, paddingVertical: 10, marginBottom: 10 }}>
+      <Block key={item.id}  flex={false} style={{ paddingHorizontal: 17, backgroundColor: "#E7F8FD", borderRadius: 10, paddingVertical: 10, marginBottom: 10 }}>
         <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
         <Text h3 color={Colors.catalinaBlue} >{item.content}</Text>
         <Block flex={false} style={styles.line}></Block>
@@ -213,9 +212,9 @@ class ProcessDetailScreen extends Component {
   }
   renderQuestions = () => {
     const listQuestion = [
-      { "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" },
-      { "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" },
-      { "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" }
+      {"id":1, "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" },
+      {"id":2, "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" },
+      {"id":3, "name": "Cách phòng bệnh đạo ôn", "content": "Trung bình mỗi vụ lúa xuân hàng năm Nghệ An có từ 6000 - 7000 ha lúa bị bệnh đạo ôn lá, đạo ôn cổ bông, làm thất thiệt 10.000 - 11.000 tấn lúa. Riêng vụ xuân năm 2018 do có hàng ngàn ha lúa bị bệnh đạo ôn cổ bông nên mức độ thất thiệt là đến gần 100.000 tấn lúa.", "like": "10", "comment": "100" }
     ]
     return (
       <Block>
@@ -279,11 +278,6 @@ class ProcessDetailScreen extends Component {
   }
   renderStatistical = () => {
     const { params } = this.props.navigation.state
-    const dataChart = [
-      { "id": "1230", "tracker": "Cung", "description": [{ "label": "1", "value": "2000" }, { "label": "2", "value": "2000" }, { "label": "3", "value": "2000" }], "status": "New", "priority": "Normal", "parentTask": 1228, "image": "", "planStartDate": null, "planEndDate": null, "actualStartDate": null, "actualEndDate": null, "estimatedTime": "", "actualTime": "", "done": "0%", "nvlName": "", "nvlQuantityPlan": "", "nvlUnitPricePlan": "", "nvlQuantityActual": "", "nvlUnitPriceActual": "", "slddName": "", "slddDonVi": "", "slddGiaTriChuan": "", "slddActualValue": "" },
-      { "id": "1230", "tracker": "Cau", "description": [{ "label": "1", "value": "2000" }, { "label": "2", "value": "2000" }, { "label": "3", "value": "2000" }], "status": "New", "priority": "Normal", "parentTask": 1228, "image": "", "planStartDate": null, "planEndDate": null, "actualStartDate": null, "actualEndDate": null, "estimatedTime": "", "actualTime": "", "done": "0%", "nvlName": "", "nvlQuantityPlan": "", "nvlUnitPricePlan": "", "nvlQuantityActual": "", "nvlUnitPriceActual": "", "slddName": "", "slddDonVi": "", "slddGiaTriChuan": "", "slddActualValue": "" },
-      { "id": "1230", "tracker": "Gia", "description": [{ "label": "1", "value": "2000" }, { "label": "2", "value": "2000" }, { "label": "3", "value": "2000" }], "status": "New", "priority": "Normal", "parentTask": 1228, "image": "", "planStartDate": null, "planEndDate": null, "actualStartDate": null, "actualEndDate": null, "estimatedTime": "", "actualTime": "", "done": "0%", "nvlName": "", "nvlQuantityPlan": "", "nvlUnitPricePlan": "", "nvlQuantityActual": "", "nvlUnitPriceActual": "", "slddName": "", "slddDonVi": "", "slddGiaTriChuan": "", "slddActualValue": "" }
-    ]
     return (
       <Block center flex={false} style={styles.statistical}>
         <Block flex={false} style={styles.summaryProcess} >
@@ -307,25 +301,54 @@ class ProcessDetailScreen extends Component {
     )
   }
   renderItemEstimatesCostPhase = (data) => {
-    var dataTask =[]
+    // console.log('workerNum',data[0].workerNum)
+    var workerCost = 0;
+    var dataTask = [];
+    var workerNum = 0;
+    var workerUnitFee = 0;
+    var medium =0;
     for(var i=0; i<data.length; i++){
       dataTask = dataTask.concat(data[i].materials)
+      if(data[i].workerNum){
+        workerCost += data[i].workerNum * data[i].workerUnitFee ;
+        workerNum += data[i].workerNum ;
+        workerUnitFee += data[i].workerUnitFee ;
+        medium += 1 ;
+      }
     }
+    workerUnitFee = workerUnitFee/medium
     var totalCost = 0;
     for(var i=0; i<dataTask.length; i++){
       totalCost += dataTask[i].quantity * dataTask[i].unitPrice
     }
+    totalCost += workerCost
     return (
       <Block flex={false} >
+        <Block center flex={false} style={styles.ItemEstimatesPhase}>
+          <Block flex={false}><Image source={Images.worker} tintColor={Colors.green} style={{ resizeMode: "stretch", marginRight: 20, height:20,width:20 }}></Image></Block>
+          <Block row style={{ justifyContent: 'space-between' }}>
+            <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
+              <Text h3 bold color={Colors.catalinaBlue}>Nhân công</Text>
+              <Text h3 semibold color={Colors.catalinaBlue}>{workerNum}x{workerUnitFee}</Text>
+            </Block>
+            <Block row flex={false}>
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={workerCost}/>
+              <Text h4 bold color={Colors.catalinaBlue}>đ</Text>
+            </Block>           
+          </Block>
+        </Block>
         {dataTask.map((item) =>
-          <Block key={item.id}  center flex={false} style={styles.ItemEstimatesPhase}>
+          <Block key={item._id}  center flex={false} style={styles.ItemEstimatesPhase}>
             <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
             <Block row style={{ justifyContent: 'space-between' }}>
               <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
-                <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
+                <Text h3 bold numberOfLines={1} ellipsizeMode={'tail'} style={{width:110}} color={Colors.catalinaBlue}>{item.name}</Text>
                 <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
               </Block>
-              <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice}/>
+              <Block row flex={false}>
+                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice}/>
+                <Text h4 bold color={Colors.catalinaBlue}> đ</Text>
+              </Block>
             </Block>
           </Block>
         )}
@@ -347,9 +370,16 @@ class ProcessDetailScreen extends Component {
       dataMaterials = dataMaterials.concat(dataTask[i].materials)
     }
     var totalCost = 0;
+    var workerCost = 0
     for(var i=0; i<dataMaterials.length; i++){
       totalCost += dataMaterials[i].quantity * dataMaterials[i].unitPrice
     }
+    for(var i=0; i<dataTask.length; i++){
+      if(dataTask[i].workerNum){
+        workerCost += dataTask[i].workerNum * dataTask[i].workerUnitFee ;
+      }
+    }
+    totalCost += workerCost
     return (
       <Block flex={false}>
         <Block flex={false} style={styles.totalCostOfPhase}>
@@ -359,15 +389,15 @@ class ProcessDetailScreen extends Component {
             <Text h3 bold color={Colors.white}> vnđ</Text>
           </Block>
         </Block>
-        {data.map((item) =>
-          <Block key={item.id} flex={false} style={styles.ItemEstimatesProcess}>
+        {data.map((item, index) =>
+          <Block key={index} flex={false} style={styles.ItemEstimatesProcess}>
             <Block flex={false} style={{ marginBottom: 10 }}>
-              <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
+              <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.phase')} {index + 1}: {item.name}</Text>
             </Block>
             <Block flex={false} style={styles.estimatesPhase}>
               <Block row center flex={false} style={{ height: 50, }}>
                 <Block center middle flex={false} >
-                  <Image source={Images.iconMaterialTime} style={{ resizeMode: "stretch", marginRight: 10 }}></Image>
+                  <Image source={Images.iconMaterialTime} tintColor={Colors.green} style={{ resizeMode: "stretch", marginRight: 10 }}></Image>
                 </Block>
                 <Text h3 color={Colors.catalinaBlue}>{strings('Process.time')}: </Text>
                 <Text h3 color={Colors.catalinaBlue}>{item.estimatedTime} {item.estimatedTimeUnit}</Text>
@@ -405,7 +435,7 @@ class ProcessDetailScreen extends Component {
     return (
       <Block flex={false}>
         {data.map((item) =>
-          <Block key={item.id} center flex={false} row style={{ marginBottom: 10 }} >
+          <Block key={item._id} center flex={false} row style={{ marginBottom: 10 }} >
             <Block flex={false} style={styles.dot} />
             <TouchableOpacity style={styles.task}
              onPress={() => navigation.navigate(Screens.TASK,{item,summaryProcess})}
@@ -420,21 +450,20 @@ class ProcessDetailScreen extends Component {
   }
   renderProcess = (data) => {
     var listTask = []
-    var dataEstimatesProcess = []
     if(data){
-      dataEstimatesProcess= data.tasks;
       listTask=data.tasks
     }  
     return (
       <Block flex={false} style={styles.renderContent}>
-        <Text h2 bold color={Colors.catalinaBlue}>{data.name}</Text>
+        <Text h2 bold color={Colors.catalinaBlue}>{data.name}:</Text>
         <Block flex={false} row center flex={false} style={{ paddingVertical: 10 }} >
           <Block flex={false} center middle flex={false}>
-            <Image source={Images.iconMaterialTime} style={{ resizeMode: "stretch", marginRight: 10 }}></Image>
+            <Image source={Images.iconMaterialTime} tintColor={Colors.green} style={{ resizeMode: "stretch", marginRight: 10 ,height:20,width:20 }}></Image>
           </Block>
           <Text h3 color={Colors.catalinaBlue}>{strings('Process.time')}: </Text>
           <Text h3 color={Colors.catalinaBlue}>{data.estimatedTime} {data.estimatedTimeUnit}</Text>
         </Block>
+        <Text h3 color={Colors.catalinaBlue} style={{ paddingVertical: 10 }}>{data.description}</Text>
         <Block flex={false} style={styles.estimatesPhase}>
           <Block row center flex={false} style={{ marginBottom: 10 }}>
             <Block flex={false} style={{ backgroundColor: "#ffffff", alignItems: 'center', justifyContent: 'center', }}>
@@ -443,9 +472,21 @@ class ProcessDetailScreen extends Component {
             <Text h3 bold color={"#26C165"}>{strings('Process.cost')}</Text>
           </Block>
           <Block flex={false} >
-            {this.renderItemEstimatesCostPhase(dataEstimatesProcess)}
+            {this.renderItemEstimatesCostPhase(listTask)}
           </Block>
         </Block>
+        {/* <Block flex={false} style={styles.estimatesPhase}>
+          <Block flex={false} style={{ height: 40, flexDirection: "row", alignItems: 'center' }}>
+            <Block flex={false} style={{ backgroundColor: "#ffffff", alignItems: 'center', justifyContent: 'center' }}>
+              <Image source={Images.dailyClock} style={{ resizeMode: "stretch", marginRight: 10,height:30,width:30 }}></Image>
+            </Block>
+            <Text h3 bold color={"#26C165"}>{strings('Process.dailyTask')}</Text>
+          </Block>
+          <Block flex={false}>
+            {this.renderTask(listTask)}
+          </Block>
+        </Block> */}
+
         <Block flex={false} style={styles.estimatesPhase}>
           <Block flex={false} style={{ height: 40, flexDirection: "row", alignItems: 'center' }}>
             <Block flex={false} style={{ backgroundColor: "#ffffff", alignItems: 'center', justifyContent: 'center', }}>
@@ -523,14 +564,12 @@ class ProcessDetailScreen extends Component {
           )}
         >
           <Block flex={false} style={styles.bar}>
-            <Block style={styles.backGroundImage}>
-              <Block column flex={false} style={{ paddingHorizontal: 20, paddingTop: 30, }}>
-                <Block center middle flex={false} style={styles.carousel}>
+            <Block column flex={false} style={{ paddingHorizontal: 5, paddingTop: 30, }}>
+              <Block center middle flex={false} style={styles.carousel}>
                   {this.renderCarousel()}
-                </Block>
-                <Block flex={false} style={styles.slidePhase}>
-                  {this.renderSlidePhase()}
-                </Block>
+              </Block>
+              <Block flex={false} style={styles.slidePhase}>
+                {this.renderSlidePhase()}
               </Block>
             </Block>
           </Block>

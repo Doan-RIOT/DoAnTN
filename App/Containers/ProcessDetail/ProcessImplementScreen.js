@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
+import PropTypes from 'prop-types';
 import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated, StyleSheet } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -17,7 +20,8 @@ import { strings } from '../../Locate/I18n';
 import RNFetchBlob from 'rn-fetch-blob';
 import { Config } from '../../Config';
 import { getToken } from '../../Utils/storage.helper';
-
+import { Screens } from '../../Utils/screens';
+import CardsActions from '../../Stores/Card/Actions';
 class ProcessImplementScreen extends Component {
   constructor(props) {
     super(props)
@@ -25,10 +29,9 @@ class ProcessImplementScreen extends Component {
       scrollY: new Animated.Value(0),
       isDatePickerVisible: false,
       setDatePickerVisibility: false,
-      dateStart: '',
       imageData: {},
       isVisible: false,
-      startDay: '',
+      startDay: "",
       dataInput:{},
       token: ""
     }
@@ -46,22 +49,29 @@ class ProcessImplementScreen extends Component {
       dataInput,
     })
   }
-  handleImplement = () => {
-    // console.log(this.state.imageData)
-    // console.log(this.state.dataInput)
-    const {imageData,dataInput,token}=this.state
-    // console.log('token',token)
-    // console.log(imageData.fileName, imageData.type)
+  handleImplement = (id) => {
+    const {navigation,cardsActions} = this.props;
+    const {imageData,dataInput,token,startDay}=this.state
     RNFetchBlob.fetch('POST', Config.API_URL+"/project/createActualProject", {
       Authorization: "Bearer " + token,
       "Content-Type": "multipart/form-data"
     }, [
       {name: "file", filename: imageData.fileName, type: imageData.type, data: imageData.data },
       {name:"actualScale", data:dataInput.scale},
-      {name:"planStartDate", data:dataInput.startDay},
+      {name:"planStartDate", data:startDay.toString()},
       {name:"address", data:dataInput.address},
+      {name:"projectId", data:id},
     ])
-    .then(res => console.log('res',res)).catch(err => console.log(err))
+    .then(res => 
+      {if(res.data.statusCode || res.data.statusCode === 400 ){
+        console.log("err" ,res.data)
+      }else{
+        navigation.navigate(Screens.CARD);
+        console.log("data" ,res.data)
+        cardsActions.fetchProject();
+      }
+    })
+    .catch(err => console.log(err))
   };
   showDatePicker = () => {
     this.setDatePickerVisibility(true);
@@ -73,7 +83,7 @@ class ProcessImplementScreen extends Component {
 
   handleConfirm = birthDate => {
     this.hideDatePicker();
-    var startDay = birthDate;
+    var startDay = Date.parse(birthDate);
     this.setState({
       startDay
     })
@@ -86,7 +96,6 @@ class ProcessImplementScreen extends Component {
   };
   renderSummaryProcess(data) {
     const {dataInput} = this.state
-    console.log('1',dataInput.scale)
     var item = {}
     if(dataInput.scale === undefined || dataInput.scale===NaN){
     item = data
@@ -96,7 +105,6 @@ class ProcessImplementScreen extends Component {
       data.estimatedQuantity = scale * data.estimatedQuantity 
       data.estimatedCost = scale * data.estimatedCost 
       item = data
-      console.log('2',item)
     }
     return (
       <Block flex={false} style={styles.summaryContent}>
@@ -242,7 +250,7 @@ class ProcessImplementScreen extends Component {
                       onPress={() => this.showDatePicker()}
                     />
                 }
-                // editable={false}
+                editable={false}
               />
             </TouchableOpacity>
           </Block>
@@ -287,7 +295,7 @@ class ProcessImplementScreen extends Component {
           />
         </Animated.View>
         <TouchableOpacity style={styles.buttonImplement1}
-        onPress={() => this.handleImplement()}
+        onPress={() => this.handleImplement(params._id)}
         >
           <Text h3 bold color={Colors.white}>Triển</Text>
           <Text h3 bold color={Colors.white}>khai</Text>
@@ -297,4 +305,13 @@ class ProcessImplementScreen extends Component {
     )
   }
 }
-export default ProcessImplementScreen;
+const mapStateToProps = (state) => ({
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  cardsActions: bindActionCreators(CardsActions, dispatch),
+})
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ProcessImplementScreen);

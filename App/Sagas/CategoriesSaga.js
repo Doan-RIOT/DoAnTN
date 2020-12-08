@@ -42,3 +42,18 @@ export function* fetchParentCategory(action) {
     yield put(CategoriesActions.fetchParentCategoryFailure('Error'));
   }
 }
+
+export function* fetchProjectFinished(action) {
+  try {
+    const response = yield call(categoriesService.fetchProjectFinished);
+    if (response) {
+      // const data = response.data && data !== null ? response.data : [];
+      // console.log('saga',response)
+      yield put(CategoriesActions.fetchProjectFinishedSuccess(response));
+    } else {
+      console.log('error1')
+    }
+  }catch (error) {
+    console.log('error2')
+  }
+}

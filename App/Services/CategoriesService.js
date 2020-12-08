@@ -7,8 +7,11 @@ function fetchProducts(data, language) {
 function fetchParentCategory(categoryId, language) {
   return Api.get(`/category/getbychild?categoryId=${categoryId}&&language=${language}`, true);
 }
-
+function fetchProjectFinished() {
+  return Api.get('/project/listByUser?type=ACTUAL&is_finished=true', true);
+}
 export const categoriesService = {
   fetchProducts,
   fetchParentCategory,
+  fetchProjectFinished
 }

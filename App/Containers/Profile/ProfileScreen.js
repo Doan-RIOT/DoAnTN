@@ -76,7 +76,7 @@ class ProfileScreen extends Component {
     }&seq=1`;
     return (
       <ImageBackground
-        source={Images.farmImage}
+        source={{ uri: "https://images.unsplash.com/photo-1569239591652-6cc3025b07fa?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" }}
         style={{ flex: 1 }}
         imageStyle={{ resizeMode: "stretch" }}
       >

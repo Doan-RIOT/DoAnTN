@@ -35,5 +35,6 @@ export const Screens =  {
   PROCESS_IMPLEMENT : 'ProcessImplementScreen',
   PROJECT: 'ProjectScreen',
   TASK:'TaskDetailScreen',
-  TASK_PROJECT:'TaskProjectDetailScreen'
+  TASK_PROJECT:'TaskProjectDetailScreen',
+  ADD_TASK:'AddTaskScreen'
 }

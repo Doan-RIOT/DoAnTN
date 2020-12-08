@@ -24,7 +24,7 @@ import { Screens } from '../../Utils/screens';
 import { Colors } from '../../Theme';
 import { Constants } from '../../Utils/constants';
 import { mergeCart } from '../../Utils/commonFunction';
-
+import ProcessActions from '../../Stores/Process/Actions';
 class LoginScreen extends Component {
   constructor(props) {
     super(props)
@@ -41,7 +41,7 @@ class LoginScreen extends Component {
   handleLogin = async () => {
     Keyboard.dismiss();
     const errors = [];
-    const { navigation, userActions, cardsActions, favoritesActions } = this.props;
+    const { navigation, userActions,processActions, cardsActions, favoritesActions } = this.props;
     const { username, password } = this.state;
     const data = {
       email: username,
@@ -76,7 +76,8 @@ class LoginScreen extends Component {
                 if(token){
                   saveToken(token);
                 }
-                userActions.fetchProfile()
+                userActions.fetchProfile();
+                processActions.fetchListProcess();
                 navigation.navigate(Screens.HOME);
               } else {
                 this.refs.toastFailed.show(strings('Login.msgLoginFailed'), DURATION.LENGTH_LONG);
@@ -95,7 +96,7 @@ class LoginScreen extends Component {
     const hasErrors = (key) => (errors.includes(key) ? Style.hasErrors : null)
 
     return (
-      <ImageBackground source={Images.farmImage} style={Style.image}>
+      <ImageBackground source={{ uri: "https://images.unsplash.com/photo-1569239591652-6cc3025b07fa?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" }} style={Style.image}>
         <Header
           title={strings('Login.login')}
           isShowBack
@@ -136,7 +137,7 @@ class LoginScreen extends Component {
             </Button>
 
             <Block flex={false} center middle row>
-              <Text>{`${strings('Login.noAccount')} `}</Text>
+              <Text white>{`${strings('Login.noAccount')} `}</Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate(Screens.SIGNUP)}
               >
@@ -179,6 +180,7 @@ const mapDispatchToProps = (dispatch) => ({
   userActions: bindActionCreators(UserActions, dispatch),
   cardsActions: bindActionCreators(CardsActions, dispatch),
   cartActions: bindActionCreators(CartActions, dispatch),
+  processActions: bindActionCreators(ProcessActions, dispatch),
 })
 
 export default connect(

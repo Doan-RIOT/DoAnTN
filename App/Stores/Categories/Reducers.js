@@ -49,6 +49,10 @@ export const fetchParentCategoryFailure = (state, { errorMessage }) => ({
   errorMessage,
 })
 
+export const fetchProjectFinishedSuccess = (state,{ListProjectFinished}) => ({
+  ...state,
+  ListProjectFinished,
+}) 
 /**
  * @see https://github.com/infinitered/reduxsauce#createreducer
  */
@@ -59,4 +63,5 @@ export const reducer = createReducer(INITIAL_STATE, {
   [CategoriesTypes.FETCH_PARENT_CATEGORY_LOADING]: fetchParentCategoryLoading,
   [CategoriesTypes.FETCH_PARENT_CATEGORY_SUCCESS]: fetchParentCategorySuccess,
   [CategoriesTypes.FETCH_PARENT_CATEGORY_FAILURE]: fetchParentCategoryFailure,
+  [CategoriesTypes.FETCH_PROJECT_FINISHED_SUCCESS]: fetchProjectFinishedSuccess,
 })

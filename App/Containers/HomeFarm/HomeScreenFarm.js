@@ -34,10 +34,15 @@ class HomeScreenFarm extends Component {
   }
   componentDidMount = async () => {
     //API redux
-    const { processActions,ListProcess } = this.props
+    const { processActions} = this.props
     processActions.fetchListProcess();
-    this.setState({ ListProcess: ListProcess })
     const token = await getToken();
+  }
+  UNSAFE_componentWillUpdate (nextProps) {
+    const {ListProcess}=this.props
+    if(nextProps.ListProcess!==ListProcess){
+      this.setState({ListProcess:nextProps.ListProcess})
+    }
   }
   handleOpenFilterProcess = () => {
     this.setState({

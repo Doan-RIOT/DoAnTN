@@ -23,3 +23,17 @@ export function* fetchCards(action) {
     yield put(CardsActions.fetchCardsFailure('Error'));
   }
 }
+export function* fetchProject(action) {
+  try {
+    const response = yield call(cardsService.fetchProject);
+    if (response) {
+      // const data = response.data && data !== null ? response.data : [];
+      // console.log('saga',response)
+      yield put(CardsActions.fetchProjectSuccess(response));
+    } else {
+      console.log('error1')
+    }
+  }catch (error) {
+    console.log('error2')
+  }
+}

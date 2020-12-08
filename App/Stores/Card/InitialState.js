@@ -5,4 +5,5 @@ export const INITIAL_STATE = {
   cards: {},
   loadingCards: false,
   errorMessage: null,
+  ListProject : {}
 }

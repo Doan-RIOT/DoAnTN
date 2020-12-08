@@ -45,4 +45,7 @@ export default {
   invest: require('../Assets/images/invest.png'),
   profit: require('../Assets/images/profit.png'),
   quantity: require('../Assets/images/quantity.png'),
+  dailyClock: require('../Assets/images/Clock.png'),
+  worker: require('../Assets/images/worker.png'),
+  measurements: require('../Assets/images/measurements.png'),
 }

@@ -90,7 +90,7 @@ class SignUpScreen extends Component {
     const hasErrors = (key) => (errors.includes(key) ? Style.hasErrors : null)
 
     return (
-        <ImageBackground source={Images.farmImage} style={Style.image}>
+        <ImageBackground source={{ uri: "https://images.unsplash.com/photo-1569239591652-6cc3025b07fa?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" }} style={Style.image}>
           <Header 
             title={strings('Login.signUp')}
             isShowBack
@@ -135,7 +135,7 @@ class SignUpScreen extends Component {
                 )}
               </Button>
               <Block flex={false} center middle row>
-                <Text>{`${strings('Login.haveAccount')} `}</Text>
+                <Text white>{`${strings('Login.haveAccount')} `}</Text>
                 <TouchableOpacity 
                   onPress={() => navigation.navigate(Screens.LOGIN)}
                     >

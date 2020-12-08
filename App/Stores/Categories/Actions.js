@@ -27,6 +27,8 @@ const { Types, Creators } = createActions({
   fetchParentCategoryLoading: null,
   fetchParentCategorySuccess: ['categories'],
   fetchParentCategoryFailure: ['errorMessage'],
+  fetchProjectFinished: null,
+  fetchProjectFinishedSuccess:['ListProjectFinished'],
 });
 
 export const CategoriesTypes = Types;

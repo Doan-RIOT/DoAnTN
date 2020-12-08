@@ -65,12 +65,12 @@ export default StyleSheet.create({
         backgroundColor: Colors.white
     },
     input1: {
-        borderRadius: 0,
+        borderRadius: 10,
         borderWidth: 0,
         borderColor: Colors.gray2,
         borderWidth: 1,
         fontSize: 20,
-        color:"white"
+        color:Colors.catalinaBlue,
       },
       buttonImplement: {
         height: 60,

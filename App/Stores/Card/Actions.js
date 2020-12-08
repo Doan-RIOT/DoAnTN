@@ -23,6 +23,8 @@ const { Types, Creators } = createActions({
   fetchCardsLoading: null,
   fetchCardsSuccess: ['cards'],
   fetchCardsFailure: ['errorMessage'],
+  fetchProject: null,
+  fetchProjectSuccess:['ListProject'],
 })
 
 export const CardsTypes = Types;

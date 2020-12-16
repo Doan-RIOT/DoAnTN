@@ -38,6 +38,7 @@ class ProjectDetailScreen extends Component {
         { url: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80" }, 
         { url: "https://images.unsplash.com/photo-1451440063999-77a8b2960d2b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80"}
       ],
+      updateTask : null
     }
   }
   componentDidMount() {
@@ -303,7 +304,6 @@ class ProjectDetailScreen extends Component {
     )
   }
   renderItemEstimatesCostPhase = (data) => {
-    console.log('1',data)
     var workerCost = 0;
     var dataTask = [];
     var workerNum = 0;
@@ -321,7 +321,7 @@ class ProjectDetailScreen extends Component {
     workerUnitFee = workerUnitFee/medium
     var totalCost = 0;
     for(var i=0; i<dataTask.length; i++){
-      totalCost += dataTask[i].quantity * dataTask[i].unitPrice
+      totalCost += dataTask[i].actualQuantity * dataTask[i].actualUnitPrice
     }
     totalCost += workerCost
     return (
@@ -345,10 +345,10 @@ class ProjectDetailScreen extends Component {
             <Block row style={{ justifyContent: 'space-between' }}>
               <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue} numberOfLines={1} ellipsizeMode={'tail'} style={{width:110}}>{item.name}</Text>
-                <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
+                <Text h3 semibold color={Colors.catalinaBlue}>{item.actualQuantity}x{item.actualUnitPrice}</Text>
               </Block>
               <Block row flex={false}>
-                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice}/>
+                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.actualQuantity * item.actualUnitPrice}/>
                 <Text h4 bold color={Colors.catalinaBlue}> đ</Text>
               </Block>
             </Block>
@@ -364,6 +364,11 @@ class ProjectDetailScreen extends Component {
   }
   sayHelloHandle = (data) =>{
     console.log(data)
+  }
+  updateListTasks =(data) => {
+    this.setState({
+      updateTask: data
+    });
   }
   renderItemEstimatesCostProcess = (data) => {
     const {planStartDate,time} = this.state
@@ -430,13 +435,22 @@ class ProjectDetailScreen extends Component {
   renderStandard = () => {
     return (
       <Block flex={false}>
-        <Text h2 > Bộ tiêu chí</Text>
+        <Text h2 ></Text>
       </Block>
     )
   }
   renderTask = (data,startPhase,endPhase) => {
+    const { params } = this.props.navigation.state;
+    const idProcess = params._id;
     const { navigation } = this.props;
+    const { updateTask } = this.state;
     let timeTask = [];
+    if(updateTask && updateTask!==null){
+      data.push(updateTask);
+      this.setState({
+      updateTask: null
+    })
+    }
     if (data&& data.length !== 0){
       var start = 0;
       var end = startPhase;
@@ -445,7 +459,6 @@ class ProjectDetailScreen extends Component {
         end += data[i].estimatedTime * 24 * 60 * 60 * 1000 
         timeTask.push({start:start, end:end});
       }
-      // console.log('time',timeTask);
     }
     return (
       <Block flex={false}>
@@ -453,7 +466,7 @@ class ProjectDetailScreen extends Component {
           <Block  key={item._id} center flex={false} row style={{ marginBottom: 10 }} >
             <Block flex={false} style={styles.dot} />
             <TouchableOpacity style={styles.task}
-              onPress={() => navigation.navigate(Screens.TASK_PROJECT,{item,startTask:timeTask[index].start,endTask:timeTask[index].end,sayHello: this.sayHelloHandle})}
+              onPress={() => navigation.navigate(Screens.TASK_PROJECT,{item,startTask:timeTask[index].start,endTask:timeTask[index].end,idProcess,sayHello: this.sayHelloHandle})}
             >
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
               <Block row flex={false}>
@@ -469,9 +482,11 @@ class ProjectDetailScreen extends Component {
   }
   renderProcess = (data) => {
     const { navigation } = this.props;
-    var listTask = []
+    var listTask = [];
+    var idphase = ''
     if(data){
       listTask=data.tasks
+      idphase=data._id
     } 
     const {planStartDate, time , Index} = this.state
     return (
@@ -510,7 +525,7 @@ class ProjectDetailScreen extends Component {
             <Block row center style={{ justifyContent: 'space-between' }} >
               <Text h3 bold color={"#26C165"}>{strings('Process.task')}</Text>
               <TouchableOpacity style={{flexDirection:'row',justifyContent:"center"}}
-              onPress={() => navigation.navigate(Screens.ADD_TASK)}
+              onPress={() => navigation.navigate(Screens.ADD_TASK,{idphase,updateListTasks:this.updateListTasks})}
               >
                 <Icon name="plus-circle" size={21} color={Colors.green} />
                 <Text h3 style={{marginLeft:5}} color={"#26C165"} >{strings('Project.addTask')}</Text>
@@ -577,8 +592,8 @@ class ProjectDetailScreen extends Component {
         start = end
         end += phases[i].estimatedTime * 24 * 60 * 60 * 1000 
         time.push({start:start, end:end});
-        console.log('start',moment(start).format('DD/MM/YYYY'))
-        console.log('end',moment(end).format('DD/MM/YYYY'))
+        // console.log('start',moment(start).format('DD/MM/YYYY'))
+        // console.log('end',moment(end).format('DD/MM/YYYY'))
       }
       // console.log('time',time);
     }
@@ -619,7 +634,7 @@ class ProjectDetailScreen extends Component {
         <Animated.View style={[styles.header, { transform: [{ translateY: headerTranslate }] }]}  >
           <Header
             isShowBack
-            title={'Trồng lúa Organic'}
+            title={ProcessDetail.name}
             navigation={navigation}
           >
           </Header>

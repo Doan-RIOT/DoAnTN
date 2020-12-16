@@ -216,6 +216,7 @@ class HomeScreenFarm extends Component {
           title={'Farm'}
         />
         <Block flex={false} style={styles.scrollView}>
+        {data && data.length >0 ?(
           <FlatList
             data={data}
             keyExtractor={(item, index) => `${index}`}
@@ -223,6 +224,7 @@ class HomeScreenFarm extends Component {
               this.renderContentSummaryProcess(item)
             )}
           />
+        ):null } 
         </Block>
       </Block>
     )

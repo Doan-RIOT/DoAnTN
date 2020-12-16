@@ -369,7 +369,19 @@
     "workerUnitFee": "Đơn giá nhân công",
     "dailyTask": "Công việc hằng ngày",
     "task": "Công việc",
-    "msgErrorRequiredName":"Nhập tên công việc",
-    "msgErrorRequiredDescription":"Nhập mô tả công việc"
+    "msgErrorRequiredName":"Vui lòng nhập tên công việc",
+    "msgErrorRequiredDescription":"Vui lòng nhập mô tả công việc",
+    "msgErrorRequiredEstimatedTime":"Vui lòng nhập thơi gian ước lượng",
+    "msgErrorRequiredWorkerNum":"Vui lòng nhập số công",
+    "msgErrorRequiredWorkerUnitFee":"Vui lòng nhập đơn giá nhân công",
+    "msgErrorRequiredDailyTask":"Vui lòng chọn loại công việc",
+    "msgCreateTaskFailed":"Tạo công việc mới thất bại",
+    "editMaterial":"Cập nhật nguyên vật liệu",
+    "nameMaterial":"Tên nguyên vật liệu",
+    "quantityMaterial":"Số lượng dự toán",
+    "unitPriceMaterial":"Đơn giá dự toán",
+    "actualQuantityMaterial":"Số lượng thực tế",
+    "actualPriceMaterial":"Đơn giá thực tế",
+    "msgErrorMaterialName":"Vui lòng nhập tên nguyên vật liệu"
   }
 }

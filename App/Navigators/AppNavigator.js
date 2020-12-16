@@ -44,6 +44,7 @@ import TaskDetailScreen from '../Containers/ProcessDetail/TaskDetailScreen';
 import ProjectDetailScreen from '../Containers/ProjectDetail/ProjectDetailScreen';
 import TaskProjectDetailScreen from '../Containers/ProjectDetail/TaskProjectDetailScreen';
 import AddTaskScreen from '../Containers/ProjectDetail/AddTaskScreen';
+import MaterialDetailScreen from '../Containers/ProjectDetail/MaterialDetailScreen';
 /**
  * The root screen contains the application's navigation.
  *
@@ -204,6 +205,7 @@ const rootStackNavigator = createStackNavigator(
     [Screens.TASK]: TaskDetailScreen,
     [Screens.ADD_TASK]: AddTaskScreen,
     [Screens.PROJECT]: ProjectDetailScreen,
+    [Screens.MATERIAL_DETAIL]: MaterialDetailScreen,
     [Screens.TASK_PROJECT]:TaskProjectDetailScreen,
     [Screens.IMAGE_COMMENTS]: ImageCommentsScreen,
     [Screens.IMAGE_ZOOM]: ImageZoomScreen,

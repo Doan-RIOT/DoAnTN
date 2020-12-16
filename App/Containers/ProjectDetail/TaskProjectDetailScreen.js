@@ -15,6 +15,19 @@ import * as scale from 'd3-scale';
 import ImagePicker from 'react-native-image-picker';
 import moment from 'moment';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { cardsService } from '../../Services/CardsService';
+import ProcessActions from '../../Stores/Process/Actions';
+import { connect } from "react-redux";
+import { bindActionCreators } from 'redux';
+import PropTypes, { number, string } from 'prop-types';
+import RNFetchBlob from 'rn-fetch-blob';
+import { Config } from '../../Config';
+import {
+  getToken,
+  getUserName,
+  getPassword,
+  resetUser,
+} from "../../Utils/storage.helper";
 const { height, width } = Dimensions.get('window');
 class TaskProjectDetailScreen extends Component {
   constructor(props) {
@@ -25,29 +38,61 @@ class TaskProjectDetailScreen extends Component {
       isDatePickerVisible: false,
       setDatePickerVisibility: false,
       dateStart: '',
-      avatarSource: '',
       endTask:0,
       startTask:0,
       dataTask: {},
-      modalVisible: false
+      dataTaskUpdate:{},
+      dataMaterialUpdate:null,
+      dataMeasurementUpdate:null,
+      realityNum:null,
+      imageData:'',
+      token: "",
+      dataImage:{},
+      imageDataUpdate:null
     }
   }
   componentDidMount() {
     const { params } = this.props.navigation.state;
+    var listImage = params.item.images
+    var url = Config.API_URL
+    if(listImage && listImage.length !==0){
+      var imageData = listImage[listImage.length-1]
+      imageData = imageData.replace("http://localhost:3000",url)
+    }
+    console.log('listImage',imageData)
     this.setState({
       endTask:params.endTask,
       startTask:params.startTask,
-      dataTask:params.item
+      dataTask:params.item,
+      imageData
     })
   }
-  setModalVisible = (visible) => {
-    this.setState({ modalVisible: visible });
-  }
 
-  handleupdate (){
+  handleUpdate = async () => {
     this.props.navigation.state.params.sayHello("hello")
-    console.log(this.props.navigation.state.params.sayHello)
-    console.log(this.props.navigation.state.params)
+    const token = await getToken();
+    const {dataImage,dataTask}=this.state
+    // // const {dataTaskUpdate} = this.state
+    console.log('dataTask._id',dataTask._id)
+    console.log('token',dataImage.type)
+    RNFetchBlob.fetch('POST', Config.API_URL+"/task/uploadImages", {
+      Authorization: "Bearer " + token,
+      "Content-Type": "multipart/form-data"
+    }, [
+      {name: "files", filename: dataImage.fileName, type: dataImage.type, data: dataImage.data },
+      {name:"taskId", data:dataTask._id},
+    ])
+    .then(res => 
+      {if(res.data.statusCode || res.data.statusCode === 400 ){
+        console.log("data" ,res.data)
+      }else{
+        // navigation.navigate(Screens.CARD);
+        // console.log("data" ,res.data)
+        // cardsActions.fetchProject();
+        console.log('res',res.data)
+      }
+    })
+    .catch(err => console.log(err))
   }
   renderImagePicker = () => {
     const options = {
@@ -72,34 +117,32 @@ class TaskProjectDetailScreen extends Component {
       } else {
         // const source = { };
         this.setState({
-          avatarSource: response.data,
+          imageDataUpdate: response.data,
+          dataImage:response
         });
       }
     });
   }
   renderItemEstimatesCostPhase = (data) => {
+    const { idProcess } = this.props.navigation.state.params;
     var totalCost = 0;
+    var totalCostActual = 0;
     const {dataTask} = this.state
+    const { navigation } = this.props;
     for( var i=0; i< data.length; i++){
       totalCost += data[i].quantity * data[i].unitPrice
     }
+    for( var i=0; i< data.length; i++){
+      totalCostActual += data[i].actualQuantity * data[i].actualUnitPrice
+    }
     totalCost += dataTask.workerNum*dataTask.workerUnitFee
+    totalCostActual += dataTask.workerNum*dataTask.workerUnitFee
     return (
       <Block flex={false} >
         <Block flex={false} style={styles.ItemEstimatesPhase}>
           <Block row center flex={false}>
             <Block flex={false}><Image source={Images.worker} tintColor={Colors.green} style={{ resizeMode: "stretch", marginRight: 20, height:20,width:20 }}></Image></Block>
             <Text h3 bold color={Colors.catalinaBlue}>Nhân công</Text>
-          </Block>
-          <Block row midle style={{ justifyContent: 'space-between',marginRight:40,paddingVertical:5 }}>
-            <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
-              <Text h3 bold color={Colors.catalinaBlue}>Dự toán</Text>
-              <Text h3 semibold color={Colors.catalinaBlue}>{dataTask.workerNum}x{dataTask.workerUnitFee}</Text>
-            </Block>
-            <Block row flex={false}>
-              <TextCurrency h3 bold color={Colors.catalinaBlue} value={dataTask.workerNum*dataTask.workerUnitFee}/>
-              <Text h4 bold color={Colors.catalinaBlue}>đ</Text>
-            </Block>        
           </Block>
           <Block row midle style={{ justifyContent: 'space-between',paddingVertical:5 }}>
             <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
@@ -111,15 +154,13 @@ class TaskProjectDetailScreen extends Component {
               <Text h4 bold color={Colors.catalinaBlue}>đ</Text>
             </Block>
             <TouchableOpacity style={{backgroundColor:'#E7F8FD'}}
-                onPress={() => {
-                this.setModalVisible(true);
-              }}>
+                onPress={() => navigation.navigate(Screens.MATERIAL_DETAIL,{dataTask,idProcess})}>
                 <Icon
                 style={{ marginLeft: 20 }}
                 name="edit"
                 size={20}
               />
-              </TouchableOpacity>         
+            </TouchableOpacity>         
           </Block>
         </Block>
         {data.map((item,index) =>
@@ -141,16 +182,14 @@ class TaskProjectDetailScreen extends Component {
             <Block row midle style={{ justifyContent: 'space-between',paddingVertical:5 }}>
               <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue}>Thực tế:</Text>
-                <Text h3 semibold color={Colors.catalinaBlue}>{item.quantity}x{item.unitPrice}</Text>
+                <Text h3 semibold color={Colors.catalinaBlue}>{item.actualQuantity}x{item.actualUnitPrice}</Text>
               </Block>
               <Block row flex={false}>
-                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.quantity * item.unitPrice} />
+                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.actualQuantity * item.actualUnitPrice} />
                 <Text h4 bold color={Colors.catalinaBlue}>đ</Text>  
               </Block>
               <TouchableOpacity style={{backgroundColor:'#E7F8FD'}}
-                onPress={() => {
-                this.setModalVisible(true);
-              }}>
+                onPress={() => navigation.navigate(Screens.MATERIAL_DETAIL,{item,idProcess})}>
                 <Icon
                 style={{ marginLeft: 20 }}
                 name="edit"
@@ -171,7 +210,7 @@ class TaskProjectDetailScreen extends Component {
           </Block>
           <Block flex={false} row style={{ marginVertical: 10 }}>
             <Text h3 bold color={Colors.catalinaBlue}>Thực tế: </Text>
-            <TextCurrency h3 bold color={Colors.catalinaBlue} value={totalCost}/>
+            <TextCurrency h3 bold color={Colors.catalinaBlue} value={totalCostActual}/>
             <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
           </Block>
         </Block>
@@ -179,12 +218,42 @@ class TaskProjectDetailScreen extends Component {
     )
   }
   renderEstimatesCostTask = (materials) => {
-    console.log('dataTask',materials)
     return (
       <Block flex={false}>
         {materials? this.renderItemEstimatesCostPhase(materials):null}
       </Block>
     )
+  }
+  handleChangeMeasurements = async (text, item) => {
+    const { idProcess } = this.props.navigation.state.params;
+    const token = await getToken();
+    const { processActions } = this.props;
+    var data = { 
+      _id: item._id, 
+      realityNum: text
+      }
+    if(token){
+      try {
+        cardsService.updateMeasurements(data,token)
+            .then(response => {
+              if (response) {
+                console.log('update done')
+                processActions.fetchProcessDetail(idProcess);
+              } else {
+                console.log('err1')
+              }
+            });
+      } catch (error) {
+        console.log('err2')
+      }
+    }
+  }
+  handleChange = (value, key) => {
+    let { dataTaskUpdate } = this.state;
+    dataTaskUpdate[key] = value;
+    this.setState({
+      dataTaskUpdate,
+    })
   }
   renderItemSLDD = (data) => {
     return (
@@ -209,7 +278,6 @@ class TaskProjectDetailScreen extends Component {
                   labelStyle={{ color: Colors.catalinaBlue, fontSize: 18,fontWeight: 'bold' }}
                   style={[styles.input1]}
                   value={item.standardNum.toString()}
-                  // onChangeText={(text) => this.setState({ username: text })}
                   labelColor={Colors.catalinaBlue}
                   rightLabel={
                     <Text h3 color={Colors.catalinaBlue} style={{marginTop:35,position: 'absolute',}}>{item.unit}</Text>
@@ -221,8 +289,9 @@ class TaskProjectDetailScreen extends Component {
                   label={"Sô liệu thực tế:"}
                   labelStyle={{ color: Colors.catalinaBlue, fontSize: 18,fontWeight: 'bold' }}
                   style={[styles.input1]}
-                  value={item.standardNum.toString()}
-                  // onChangeText={(text) => this.setState({ username: text })}
+                  value={item.realityNum && item.realityNum!==0 ? item.realityNum.toString() : null}
+                  number
+                  onChangeText={text => this.handleChangeMeasurements(text,item)}
                   labelColor={Colors.catalinaBlue}
                   rightLabel={
                     <Text h3 color={Colors.catalinaBlue} style={{marginTop:35,position: 'absolute',}}>{item.unit}</Text>
@@ -245,7 +314,8 @@ class TaskProjectDetailScreen extends Component {
   render() {
     const { navigation } = this.props;
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
-    let {endTask,startTask,dataTask} = this.state
+    let {endTask,startTask,dataTask,imageData} = this.state
+
     let materials = [];
     let measurements = [];
     if(dataTask&&dataTask.length!==0){
@@ -257,7 +327,6 @@ class TaskProjectDetailScreen extends Component {
       outputRange: [0, -60],
       extrapolate: 'clamp',
     });
-    const { modalVisible } = this.state;
     return (
       <Block style={{ backgroundColor: "#B8F39A" }}>
         <Block flex={false} style={styles.estimatesTime}>
@@ -302,9 +371,10 @@ class TaskProjectDetailScreen extends Component {
               </Block>
             :null}
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
-              <Text h3 bold style={{ marginVertical: 10 }}>Mô tả tình trạng: </Text>
+              <Text h3 bold style={{ marginVertical: 10 }}>Cập nhật tình trạng: </Text>
               <Input
                 style={[styles.input,]}
+                onChangeText={text => this.handleChange(text, 'note')}
               />
             </Block>
             <Block flex={false} style={{ marginTop: 20, marginHorizontal: 20 }}>
@@ -317,7 +387,7 @@ class TaskProjectDetailScreen extends Component {
                 </TouchableOpacity>
               </Block>
               <Block flex={false} style={{ height: 200, marginVertical: 10, borderColor: "#D6D6D6", borderWidth: 1, borderRadius: 10 }}>
-                <Image style={{ flex: 1 }} source={{ uri: 'data:image/jpeg;base64,' + this.state.avatarSource }} ></Image>
+                <Image style={{ flex: 1 }} source={this.state.imageDataUpdate!==null ? { uri: 'data:image/jpeg;base64,' + this.state.imageDataUpdate }:{ uri: this.state.imageData }}></Image>
               </Block>
             </Block>
           </Block>
@@ -331,47 +401,21 @@ class TaskProjectDetailScreen extends Component {
           </Header>
         </Animated.View>
         <TouchableOpacity style={styles.buttonImplement}
-           onPress={() => this.handleupdate()}
+           onPress={() => this.handleUpdate()}
         >
               
           <Text h3 bold color={Colors.white}>Cập</Text>
           <Text h3 bold color={Colors.white}>nhật</Text>
         </TouchableOpacity>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-          }}
-        >
-          <Block style={styles.centeredView}>
-            <Block style={styles.modalView}>
-            <Input
-              label={'Số lượng'}
-              style={[styles.input2,]}
-              // onChangeText={text => this.handleChange(text, 'scale')}
-              number
-            />
-            <Input
-              label={'Đơn giá'}
-              style={[styles.input2,]}
-              // onChangeText={text => this.handleChange(text, 'scale')}
-              number
-            />
-              <TouchableHighlight
-                style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-                onPress={() => {
-                  this.setModalVisible(!modalVisible);
-                }}
-              >
-                <Text style={styles.textStyle}>Thoát</Text>
-              </TouchableHighlight>
-            </Block>
-          </Block>
-        </Modal>
       </Block>
     )
   }
 }
-export default TaskProjectDetailScreen;
+const mapStateToprop = (state) => ({
+  processDetail: state.process.processDetail
+})
+
+const mapDispatchToProps = (dispatch) => ({
+  processActions: bindActionCreators(ProcessActions, dispatch),
+})
+export default connect(mapStateToprop, mapDispatchToProps)(TaskProjectDetailScreen);

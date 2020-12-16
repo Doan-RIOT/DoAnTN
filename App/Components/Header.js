@@ -33,7 +33,7 @@ export default class Header extends Component {
       userId
     } = this.props;
     return (
-      <Block flex={false} color={"#BEF4A3"}  row center style={[styles.header, style]}>
+      <Block flex={false} color={Colors.green}  row center middle style={[styles.header, style]}>
         <Block flex={false} style={{ width: '10%' }}>
           {isShowBack && (
             <TouchableOpacity onPress={() => this.handleGoBack()}>
@@ -71,8 +71,8 @@ Header.propTypes = {
 const styles = StyleSheet.create({
   header: {
     paddingHorizontal: Sizes.base / 2,
-    paddingTop: Sizes.base * 1.5,
-    paddingBottom: Sizes.base / 4,
+    paddingVertical:5,
+    height:60
   },
   headerRight: {
     width: '10%',

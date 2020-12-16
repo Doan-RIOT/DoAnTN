@@ -118,5 +118,6 @@ const styles = StyleSheet.create({
     width: Sizes.base * 2,
     height: Sizes.base * 2,
     right: 0,
+    marginHorizontal:5
   },
 });

@@ -26,6 +26,7 @@ import { Config } from '../../Config/index';
 import { Screens } from '../../Utils/screens';
 import { Constants } from '../../Utils/constants';
 import { LoginManager } from 'react-native-fbsdk';
+import { cardsService } from '../../Services/CardsService';
 const { width } = Dimensions.get('window');
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -44,30 +45,60 @@ class AddTaskScreen extends Component {
   }
   handleSave = () => {
     const {newTask} = this.state;
-    const { language, userActions, navigation } = this.props;
+    const {navigation } = this.props;
+    const { params } = this.props.navigation.state;
+    let idphase = params.idphase
+    if(newTask){
+      var data = { 
+      phaseId: idphase, 
+      name: newTask.name,
+      description: newTask.description,
+      estimatedTime: parseInt(newTask.estimatedTime),
+      estimatedTimeUnit:"Ngày",
+      workerNum: parseInt(newTask.workerNum),
+      workerUnitFee: parseInt(newTask.workerUnitFee),
+      isDailyTask: newTask.isDailyTask ==="0"?true:false,
+      }
+    }
     let errors = [];
     let msgError = '';
-    if (newTask.name === '' || newTask.name  === null) {
-      errors.push('firstName');
+    if (newTask.name === '' || newTask.name  === undefined) {
+      errors.push('name');
       msgError = strings('Project.msgErrorRequiredName');
-    } else if (newTask.description === '' || newTask.description === null) {
-      errors.push('phone');
+    }else if (newTask.description === '' || newTask.description === undefined) {
+      errors.push('description');
       msgError = strings('Project.msgErrorRequiredDescription');
+    }else if (newTask.estimatedTime === '' || newTask.estimatedTime === undefined) {
+      errors.push('estimatedTime');
+      msgError = strings('Project.msgErrorRequiredEstimatedTime');
+    }else if (newTask.workerNum === '' || newTask.workerNum === undefined) {
+      errors.push('workerNum');
+      msgError = strings('Project.msgErrorRequiredWorkerNum');
+    }else if (newTask.workerUnitFee === '' || newTask.workerUnitFee === undefined) {
+      errors.push('workerUnitFee');
+      msgError = strings('Project.msgErrorRequiredWorkerUnitFee');
+    }else if (newTask.isDailyTask === '' || newTask.isDailyTask === undefined) {
+      errors.push('isDailyTask');
+      msgError = strings('Project.msgErrorRequiredDailyTask');
     }
     this.setState({
       msgError,
       errors
     })
     if (errors.length === 0) {
-      // try {
-      //   userService.updateProfile(profile, language)
-      //   userActions.fetchProfile()
-      //   navigation.navigate(Screens.PROFILE);
-      // } catch (error) {
-      //   this.refs.toastFailed.show(strings('UserInfo.msgUpdateProfileFailed'), DURATION.LENGTH_LONG);
-      // }
-      
-    console.log('newTask',newTask)
+      try {
+        cardsService.createTask(data)
+            .then(response => {
+              if (response) {
+                navigation.navigate(Screens.PROJECT);
+                this.props.navigation.state.params.updateListTasks(response)
+              } else {
+                this.refs.toastFailed.show(strings('Project.msgCreateTaskFailed'), DURATION.LENGTH_LONG);
+              }
+            });
+      } catch (error) {
+        this.refs.toastFailed.show(strings('Project.msgCreateTaskFailed'), DURATION.LENGTH_LONG);
+      }
     }
   }
   handleChange = (value, key) => {
@@ -110,6 +141,7 @@ class AddTaskScreen extends Component {
               label={strings('Project.estimatedTime')}
               error={hasErrors('email')}
               style={Style.input}
+              number
               value={newTask && newTask.estimatedTime ? newTask.estimatedTime : ''}
               onChangeText={text => this.handleChange(text, 'estimatedTime')}
             />
@@ -129,8 +161,8 @@ class AddTaskScreen extends Component {
               number
               onChangeText={text => this.handleChange(text, 'workerUnitFee')}
             />
-            <Block row>
-              <Block flex={false} style={{ width: '30%' }}>
+            <Block row style={{ justifyContent: 'space-between' }}>
+              <Block flex={false} style={{ width: '50%' }}>
                 <Radio
                   label={strings('Project.dailyTask')}
                   value="0"
@@ -165,6 +197,24 @@ class AddTaskScreen extends Component {
               </Button>
             </Block>
           </Block>
+        <Toast
+          ref="toastSuccess"
+          style={{ backgroundColor: Colors.green }}
+          position='top'
+          positionValue={200}
+          fadeInDuration={750}
+          fadeOutDuration={1000}
+          opacity={0.8}
+        />
+        <Toast
+          ref="toastFailed"
+          style={{ backgroundColor: Colors.accent }}
+          position='top'
+          positionValue={200}
+          fadeInDuration={750}
+          fadeOutDuration={1000}
+          opacity={0.8}
+        />
         </ScrollView>
       </Block>
     )

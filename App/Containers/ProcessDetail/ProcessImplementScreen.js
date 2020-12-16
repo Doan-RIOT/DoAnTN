@@ -213,7 +213,7 @@ class ProcessImplementScreen extends Component {
     return (
       <Block color={"#F4F4F4"}>
         <ScrollView style={styles.container}
-          onScroll={Animated.event(
+          re={Animated.event(
             [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]
           )}
         >

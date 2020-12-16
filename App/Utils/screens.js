@@ -36,5 +36,6 @@ export const Screens =  {
   PROJECT: 'ProjectScreen',
   TASK:'TaskDetailScreen',
   TASK_PROJECT:'TaskProjectDetailScreen',
-  ADD_TASK:'AddTaskScreen'
+  ADD_TASK:'AddTaskScreen',
+  MATERIAL_DETAIL:'MaterialDetailScreen'
 }

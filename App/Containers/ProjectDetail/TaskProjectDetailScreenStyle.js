@@ -70,6 +70,7 @@ export default StyleSheet.create({
         borderWidth: 1,
         fontSize: 20,
         color:Colors.catalinaBlue,
+        paddingHorizontal:10
       },
       buttonImplement: {
         height: 60,

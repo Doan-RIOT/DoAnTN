@@ -28,11 +28,11 @@ export default StyleSheet.create({
     shadowOffset: { width: 0, height: 3, },
     shadowOpacity: 0.27,
     shadowRadius: 4.65, elevation: 6,
-    paddingBottom:5
+    paddingBottom:10
   },
   image: {
     height: height / 3,
-    width: width - 20,
+    width: width - 10,
     resizeMode: 'stretch',
     borderTopLeftRadius: 9,
     borderTopRightRadius: 9
@@ -40,7 +40,7 @@ export default StyleSheet.create({
   summary: {
     opacity: 0.90,
     height: height / 4 + 40,
-    width: width - 30,
+    width: width - 20,
     position: 'absolute',
     borderTopLeftRadius: 9,
     borderTopRightRadius: 9,
@@ -60,7 +60,7 @@ export default StyleSheet.create({
 
   },
   statistical: {
-    paddingHorizontal:10,
+    paddingHorizontal:5,
     marginTop: 80,
   },
   header: {

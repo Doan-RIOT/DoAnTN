@@ -83,10 +83,10 @@ class ProfileScreen extends Component {
         <TouchableOpacity
           style={{ alignItems: "center" }}
           onPress={() => this.handleNavigateUserInfo()}
-          disabled={!token || (token && token === "")}
+          // disabled={!token || (token && token === "")}
         >
           <Block flex={false} center style={Style.container}>
-            <Block flex={false} style={{ marginLeft: 10 }}>
+            <Block center middle flex={false} style={{ marginLeft: 10 }}>
               {this.state.isSigningIn === true ? (
                 <Block flex={false}>
                   {profile ? (

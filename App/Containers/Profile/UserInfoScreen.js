@@ -220,6 +220,13 @@ class UserInfoScreen extends Component {
   };
   handleChange = (value, key) => {
     let { profile } = this.state;
+    if(key === 'gender'){
+      if(value === '1'){
+        value = true
+      }else if(value === '0'){
+        value = false
+      }
+    }
     profile[key] = value;
     this.setState({
       profile,
@@ -284,6 +291,7 @@ class UserInfoScreen extends Component {
       isVisible, profile, isOpen,
       errorCode, errors, msgError
     } = this.state;
+    console.log('profile',profile)
     const dateTimePicker = profile.dob
     const hasErrors = (key) => (errors.includes(key) ? Style.hasErrors : null)
     const imageUrl = `${Config.IMAGE_URL}?uploadId=${profile.avatar ? profile.avatar : ''}&seq=1`;
@@ -354,8 +362,8 @@ class UserInfoScreen extends Component {
               <Block flex={false} style={{ width: '30%' }}>
                 <Radio
                   label={strings('UserInfo.male')}
-                  value="0"
-                  color={Colors.pink2}
+                  value="1"
+                  color={Colors.red}
                   styleTitle={Style.radio}
                   uncheckedColor={Colors.green}
                   checked={profile && profile.gender && profile.gender === true}
@@ -365,11 +373,11 @@ class UserInfoScreen extends Component {
               <Block flex={false}>
                 <Radio
                   label={strings('UserInfo.female')}
-                  value="1"
-                  color={Colors.pink2}
+                  value="0"
+                  color={Colors.red}
                   styleTitle={Style.radio}
                   uncheckedColor={Colors.green}
-                  checked={profile && profile.gender && profile.gender === false}
+                  checked={profile.gender === false}
                   onPress={value => this.handleChange(value, 'gender')}
                 />
               </Block>

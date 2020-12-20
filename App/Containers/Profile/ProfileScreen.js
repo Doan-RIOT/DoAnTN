@@ -68,9 +68,9 @@ class ProfileScreen extends Component {
   }
   renderInfo = () => {
     const { profile } = this.state;
+    const { local } = this.state.profile;
     const { navigation, userId } = this.props;
     const { token } = this.state;
-    console.log('token',token)
     const imageUrl = `${Config.IMAGE_URL}?uploadId=${
       profile.avatar ? profile.avatar : ""
     }&seq=1`;

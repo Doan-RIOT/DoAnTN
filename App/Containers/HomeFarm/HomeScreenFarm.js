@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, Image, TouchableWithoutFeedback, TouchableOpacity, ImageBackground, ScrollView, Animated, TextInput } from 'react-native';
+import { View, FlatList, Image, TouchableWithoutFeedback, TouchableOpacity, ImageBackground, ScrollView, Animated, TextInput, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Sizes, Colors, ApplicationStyles, Images } from '../../Theme';
 import { strings } from '../../Locate/I18n';
@@ -29,7 +29,8 @@ class HomeScreenFarm extends Component {
     this.state = {
       scrollY: new Animated.Value(0),
       isLoadingFilterProcess: false,
-      ListProcess:[]
+      ListProcess:[],
+      refreshing: false,
     }
   }
   componentDidMount = async () => {
@@ -144,7 +145,9 @@ class HomeScreenFarm extends Component {
             </TouchableOpacity>
           </Block>
           <Block style={{ marginTop: 5 }}>
-            <ScrollView>
+            <ScrollView
+            showsHorizontalScrollIndicator={false}
+            >
               <Block flex={false} style={{ marginTop: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue}>{strings('HomeFarm.investmentCosts')}</Text>
                 <Block row flex={false} style={{ justifyContent: 'space-between', marginTop: 10 }}>
@@ -208,8 +211,21 @@ class HomeScreenFarm extends Component {
       </Block>
     );
   };
+  onRefresh = () => {
+		const {} = this.props;
+		this.handleFilterSortProcess();
+	};
+
+	handleFilterSortProcess = () => {
+    const { processActions} = this.props
+    processActions.fetchListProcess();
+		this.setState({
+			isEditing: true,
+		});
+	};
   render() {
     const data = this.state.ListProcess;
+    const {refreshing} = this.state
     return (
       <Block center >
         <Header
@@ -220,6 +236,13 @@ class HomeScreenFarm extends Component {
           <FlatList
             data={data}
             keyExtractor={(item, index) => `${index}`}
+            refreshControl={
+							<RefreshControl
+								//refresh control used for the Pull to Refresh
+								refreshing={refreshing}
+								onRefresh={() => this.onRefresh()}
+							/>
+						}
             renderItem={({ item }) => (
               this.renderContentSummaryProcess(item)
             )}

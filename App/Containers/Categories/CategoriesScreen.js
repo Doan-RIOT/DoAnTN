@@ -135,7 +135,7 @@ class CategoriesScreen extends Component {
     const data = this.state.listProjectFinished;
     return (
       <Block center style={{ marginTop: 60 }}>
-        {data.map((item) => this.renderItemProject(item))}
+        {data && data.length > 0 ?(data.map((item) => this.renderItemProject(item))):null}
       </Block>
     );
   }

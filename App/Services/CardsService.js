@@ -20,6 +20,12 @@ function createTask(data) {
     isDailyTask: data.isDailyTask,
   }, true);
 }
+function createMaterial(data) {
+  return Api.post('/material/create',data, true);
+}
+function createMeasurements(data) {
+  return Api.post('/measurement/create',data, true);
+}
 function updateMeasurements (data,token) {
   return Axios.put(`${Config.API_URL}/measurement/update`, {
     "_id": data._id, 
@@ -40,5 +46,7 @@ export const cardsService = {
   fetchProject,
   createTask,
   updateMeasurements,
-  updateMaterial
+  updateMaterial,
+  createMaterial,
+  createMeasurements
 }

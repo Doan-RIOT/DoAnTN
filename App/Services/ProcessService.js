@@ -14,7 +14,7 @@ function fetchProcess() {
 }
 
 function fetchListProcess(data) {
-  return Api.get('/project/list?page=0&size=5&is_active=true', true);
+  return Api.get('/project/list?page=0&size=5&all=false', false);
 }
 
 function fetchProcessDetail(idProcess) {

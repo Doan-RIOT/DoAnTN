@@ -83,8 +83,8 @@ class TaskDetailScreen extends Component {
             </Block>           
           </Block>
         </Block>
-        {data.map((item) =>
-          <Block key={item._id} center flex={false} style={styles.ItemEstimatesPhase}>
+        {data.map((item, index) =>
+          <Block key={index} center flex={false} style={styles.ItemEstimatesPhase}>
             <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
             <Block row style={{ justifyContent: 'space-between' }}>
               <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
@@ -121,8 +121,8 @@ class TaskDetailScreen extends Component {
   renderItemSLDD = (data) => {
     return (
       <Block flex={false} >
-        {data.map((item) =>
-          <Block key={item.id} flex={false} style={styles.ItemSLDDD}>
+        {data.map((item,index) =>
+          <Block key={index} flex={false} style={styles.ItemSLDDD}>
             <Block center row flex={false}>
               <Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image>
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
@@ -166,6 +166,15 @@ class TaskDetailScreen extends Component {
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
     const { item,summaryProcess } = this.props.navigation.state.params;
     const data = item;
+    console.log('data',data)
+    var listImage = item.images
+    var url = Config.API_URL
+    var imageTemp = 'https://imttrade.com/wp-content/uploads/2016/12/white-background-2.jpg'
+    var imageData = ''
+    if(listImage && listImage.length !==0){
+      imageData = listImage[listImage.length-1]
+      imageData = imageData.replace("http://localhost:3000",url)
+    }
     const params = summaryProcess
     const headerTranslate = diffClamp.interpolate({
       inputRange: [0, 45],
@@ -180,9 +189,7 @@ class TaskDetailScreen extends Component {
           </Block>
         </Block>
         <ScrollView style={styles.container}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]
-          )}
+        showsHorizontalScrollIndicator={false}
         >
           <Block style={styles.taskContent}>
             <Block center midle flex={false} style={{paddingHorizontal:30}}>
@@ -213,7 +220,7 @@ class TaskDetailScreen extends Component {
                 </TouchableOpacity>
               </Block>
               <Block flex={false} style={{ height: 200, marginVertical: 10, borderColor: "#D6D6D6", borderWidth: 1, borderRadius: 10 }}>
-                <Image style={{ flex: 1 }} source={{ uri: 'data:image/jpeg;base64,' + this.state.avatarSource }} ></Image>
+                <Image style={{ flex: 1 }} source={imageData === ''?{ uri: imageTemp }:{ uri: imageData }} ></Image>
               </Block>
             </Block>
           </Block>

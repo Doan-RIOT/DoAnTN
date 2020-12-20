@@ -31,7 +31,8 @@ class CardScreen extends Component {
       cards: {},
       typeCode: 'barCode',
       scrollY: new Animated.Value(0),
-      listProject:[]
+      listProject:[],
+      refreshing: false,
     }
   }
   componentDidMount() {
@@ -167,7 +168,20 @@ class CardScreen extends Component {
     });
     // console.log(this.state.Index)
   }
+  onRefresh = () => {
+		const {} = this.props;
+		this.handleFilterSortProcess();
+	};
+
+	handleFilterSortProcess = () => {
+    const { processActions} = this.props
+    // processActions.fetchListProcess();
+		// this.setState({
+		// 	isEditing: true,
+		// });
+	};
   render() {
+    const {refreshing} = this.state
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
     const headerTranslate = diffClamp.interpolate({
       inputRange: [0, 45],
@@ -177,6 +191,13 @@ class CardScreen extends Component {
     return (
       <Block style={{}}>
         <ScrollView
+          refreshControl={
+							<RefreshControl
+								//refresh control used for the Pull to Refresh
+								refreshing={refreshing}
+								onRefresh={() => this.onRefresh()}
+							/>
+						}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]
           )}>
@@ -185,7 +206,7 @@ class CardScreen extends Component {
         <Animated.View style={[styles.header, { transform: [{ translateY: headerTranslate }] }]}  >
           <Header
             title={'Dự án của tôi'}
-          >
+            >
           </Header>
         </Animated.View>
       </Block>

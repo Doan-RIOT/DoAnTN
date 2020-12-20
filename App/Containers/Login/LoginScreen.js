@@ -71,7 +71,7 @@ class LoginScreen extends Component {
         try {
           userService.login(data)
             .then(response => {
-              if (response) {
+              if (response && response.token !== undefined) {
                 const { token } = response
                 if(token){
                   saveToken(token);

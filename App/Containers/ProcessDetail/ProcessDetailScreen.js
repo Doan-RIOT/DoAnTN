@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated,Dimensions } from 'react-native';
+import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated,Dimensions, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Sizes, Colors, ApplicationStyles, Images } from '../../Theme';
 import { Screens } from '../../Utils/screens';
@@ -37,6 +37,7 @@ class ProcessDetailScreen extends Component {
         { url: "https://images.unsplash.com/photo-1451440063999-77a8b2960d2b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80"}
       ],
       ProcessDetail: [],
+      refreshing: false,
     }
   }
   componentDidMount() {
@@ -283,7 +284,7 @@ class ProcessDetailScreen extends Component {
         <Block flex={false} style={styles.summaryProcess} >
           {this.renderSummaryProcess(params)}
         </Block>
-        <Block flex={false} style={styles.chart}>
+        {/* <Block flex={false} style={styles.chart}>
           <Block flex={false} row>
             <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.priceChart')}</Text>
             <Block flex={false} center middle style={{ backgroundColor: Colors.white, marginLeft: 10, borderRadius: 10, paddingHorizontal: 10, }}>
@@ -296,7 +297,7 @@ class ProcessDetailScreen extends Component {
           <Block>
             {this.renderPriceChart()}
           </Block>
-        </Block>
+        </Block> */}
       </Block>
     )
   }
@@ -542,9 +543,24 @@ class ProcessDetailScreen extends Component {
         )
     }
   }
+  onRefresh = () => {
+		const {} = this.props;
+		this.handleFilterSortProcess();
+	};
+
+	handleFilterSortProcess = () => {
+    const { params } = this.props.navigation.state;
+    const idProcess = params._id;
+    const { processActions } = this.props;
+    processActions.fetchProcessDetail(idProcess);
+		this.setState({
+			isEditing: true,
+		});
+	};
   render() {
     const { navigation } = this.props;
     const { params } = this.props.navigation.state;
+    const {refreshing} = this.state
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
     // const headerHeight = diffClamp.interpolate({
     //   inputRange: [0, 55],
@@ -562,6 +578,13 @@ class ProcessDetailScreen extends Component {
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]
           )}
+          refreshControl={
+							<RefreshControl
+								//refresh control used for the Pull to Refresh
+								refreshing={refreshing}
+								onRefresh={() => this.onRefresh()}
+							/>
+						}
         >
           <Block flex={false} style={styles.bar}>
             <Block column flex={false} style={{ paddingHorizontal: 5, paddingTop: 30, }}>
@@ -575,7 +598,7 @@ class ProcessDetailScreen extends Component {
           </Block>
           {/* render centent */}
           {this.renderContentprocess()}
-          <Block flex={false} style={styles.questions}>
+          {/* <Block flex={false} style={styles.questions}>
             <Block row center flex={false}>
               <Block center middle flex={false} style={{ height: 40, width: 40 }}>
                 <Image source={Images.iconQuestion} style={{ resizeMode: 'stretch', height: 27, width: 27 }}></Image>
@@ -583,7 +606,7 @@ class ProcessDetailScreen extends Component {
               <Text h2 color={"#26C165"}>{strings('Process.questions')}</Text>
             </Block>
             {this.renderQuestions()}
-          </Block>
+          </Block> */}
         </ScrollView>
         <Animated.View style={[styles.header, { transform: [{ translateY: headerTranslate }] }]}  >
           <Header

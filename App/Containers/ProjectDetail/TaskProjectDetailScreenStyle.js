@@ -138,4 +138,11 @@ export default StyleSheet.create({
         marginTop: 5,
         backgroundColor: Colors.white,
     },
+    input: {
+      borderRadius: 0,
+      borderWidth: 0,
+      borderColor: Colors.green,
+      borderWidth: StyleSheet.hairlineWidth,
+      fontSize: Sizes.h3,
+    },
 })

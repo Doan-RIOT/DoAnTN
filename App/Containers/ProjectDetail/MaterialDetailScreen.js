@@ -73,6 +73,7 @@ class MaterialDetailScreen extends Component {
                 if (response) {
                   console.log('update done')
                   processActions.fetchProcessDetail(idProcess);
+                  navigation.navigate(Screens.TASK_PROJECT);
                 } else {
                   console.log('err1')
                 }

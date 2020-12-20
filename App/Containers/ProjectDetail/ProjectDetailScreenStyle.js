@@ -138,8 +138,8 @@ export default StyleSheet.create({
     },
     chart: {
         backgroundColor: "#E7F8FD",
-        marginTop: 25,
-        paddingVertical: 10,
+        marginTop: 30,
+        paddingVertical: 15,
         paddingHorizontal: 10,
         width: "100%",
         borderRadius: 10,
@@ -215,4 +215,11 @@ export default StyleSheet.create({
         borderColor: "#707070",
         borderWidth: 0.5,
     },
+    input: {
+        borderRadius: 0,
+        borderWidth: 0,
+        borderColor: Colors.green,
+        borderWidth: StyleSheet.hairlineWidth,
+        fontSize: Sizes.h3,
+      },
 })

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated, Dimensions, } from 'react-native';
+import { FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, Animated, Dimensions, RefreshControl, } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Sizes, Colors, ApplicationStyles, Images } from '../../Theme';
 import { Screens } from '../../Utils/screens';
 import {
-  Button, Block, BaseModal, Cart,TextCurrency,
+  Button, Block, BaseModal, Cart, TextCurrency,
   Card, Header, Input, Picker, Loading, Text,
 } from "../../Components";
 import { Title } from 'react-native-paper';
@@ -20,6 +20,10 @@ import PropTypes, { number, string } from 'prop-types';
 import ProcessActions from '../../Stores/Process/Actions';
 import { Config } from '../../Config';
 import moment from 'moment';
+import ImagePicker from 'react-native-image-picker';
+import Swipeout from 'react-native-swipeout';
+import { Directions } from 'react-native-gesture-handler';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 const { width } = Dimensions.get('window');
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -32,13 +36,17 @@ class ProjectDetailScreen extends Component {
       scrollY: new Animated.Value(0),
       ProcessDetail: [],
       carousel: [],
-      planStartDate:0,
-      time:[],
+      planStartDate: 0,
+      time: [],
       carouselBackUp: [
-        { url: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80" }, 
-        { url: "https://images.unsplash.com/photo-1451440063999-77a8b2960d2b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80"}
+        { url: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80" },
+        { url: "https://images.unsplash.com/photo-1451440063999-77a8b2960d2b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1489&q=80" }
       ],
-      updateTask : null
+      updateTask: null,
+      isOpen: false,
+      isVisible: false,
+      startDay: "",
+      refreshing: false,
     }
   }
   componentDidMount() {
@@ -46,45 +54,45 @@ class ProjectDetailScreen extends Component {
     const idProcess = params._id;
     const { processActions } = this.props;
     processActions.fetchProcessDetail(idProcess);
-    const {carousel} = this.state
-    this.setState({planStartDate:params.planStartDate})
+    const { carousel } = this.state
+    this.setState({ planStartDate: params.planStartDate })
     //carousel
     var images = params.images
     var url = Config.API_URL
-    if(images){
-      for(var i =0 ; i<images.length;i++){
-        images[i]=images[i].replace("http://localhost:3000",url);
-        carousel.push({url:images[i]});
-        this.setState({carousel})
+    if (images) {
+      for (var i = 0; i < images.length; i++) {
+        images[i] = images[i].replace("http://localhost:3000", url);
+        carousel.push({ url: images[i] });
+        this.setState({ carousel })
       }
     }
   }
-  UNSAFE_componentWillUpdate (nextProps) {
-    const {processDetail}=this.props
-    if(nextProps.processDetail!==processDetail){
-      this.setState({ProcessDetail:nextProps.processDetail})
+  UNSAFE_componentWillUpdate(nextProps) {
+    const { processDetail } = this.props
+    if (nextProps.processDetail !== processDetail) {
+      this.setState({ ProcessDetail: nextProps.processDetail })
     }
   }
   renderItemCarousel = ({ item, index }) => {
     return (
       <Block center middle flex={false} key={index}>
         <Image
-          source={{uri:item.url}}
+          source={{ uri: item.url }}
           style={styles.itemCarousel}
         />
       </Block>
     );
   }
   renderCarousel = () => {
-    const { carousel,carouselBackUp } = this.state;
-    var data= null
-    if(carousel[0] === undefined){
-      data =carouselBackUp
-    }else{
+    const { carousel, carouselBackUp } = this.state;
+    var data = null
+    if (carousel[0] === undefined) {
+      data = carouselBackUp
+    } else {
       data = carousel
     }
     return (
-      <Block flex={false} style={{ marginHorizontal:10, marginTop: 2 }}>
+      <Block flex={false} style={{ marginHorizontal: 10, marginTop: 2 }}>
         <Carousel
           data={data}
           renderItem={this.renderItemCarousel}
@@ -92,7 +100,7 @@ class ProjectDetailScreen extends Component {
           autoplay={true}
           sliderWidth={widthCarousel}
           itemWidth={widthCarousel}
-          autoplayInterval= {4000}
+          autoplayInterval={4000}
         />
       </Block>
     );
@@ -100,10 +108,10 @@ class ProjectDetailScreen extends Component {
   renderSlidePhase = () => {
     const summary = ["Thống kê", "Dự toán", "Điều kiện",];
     const process = [];
-    const {phases} = this.state.ProcessDetail
-    if(phases){
-      for(var i=0; i < phases.length; i++){
-        process.push(`Giai đoạn ${i+1}`);
+    const { phases } = this.state.ProcessDetail
+    if (phases) {
+      for (var i = 0; i < phases.length; i++) {
+        process.push(`Giai đoạn ${i + 1}`);
       }
     }
     const summaryProcess = summary.concat(process);
@@ -133,6 +141,40 @@ class ProjectDetailScreen extends Component {
       </TouchableOpacity>
     )
   }
+  renderBodyModal = () => {
+    const { navigation } = this.props;
+    return (
+      <Block>
+        <Button
+          green
+          onPress={() => {
+            this.handleCloseModal();
+            navigation.navigate(Screens.LOGIN)
+          }}
+        >
+          <Text bold white center>
+            {strings('Login.login')}
+          </Text>
+        </Button>
+        <Button
+          green
+          onPress={() => {
+            this.handleCloseModal();
+            navigation.navigate(Screens.SIGNUP)
+          }}
+        >
+          <Text bold white center>
+            {strings('Login.signUp')}
+          </Text>
+        </Button>
+      </Block>
+    );
+  };
+  handleCloseModal = () => {
+    this.setState({
+      isOpen: false,
+    })
+  };
   handleIndexContentProcess = Index => {
     this.setState({
       Index
@@ -168,7 +210,7 @@ class ProjectDetailScreen extends Component {
         <Block center flex={false} style={styles.summaryContentItem}>
           <Block flex={false}><Image source={Images.iconLand}></Image></Block>
           <Block row style={{ justifyContent: 'space-between' }}>
-            <Text h3 style={styles.Title_summary}>{strings('HomeFarm.scale')}:</Text>
+            <Text h3 style={styles.Title_summary}>Diện tích canh tác:</Text>
             <Text h3 bold style={styles.Title_summary}>{item.minimalScale} {item.standardUnit}</Text>
           </Block>
         </Block>
@@ -205,9 +247,9 @@ class ProjectDetailScreen extends Component {
           <Block row style={{ justifyContent: 'space-between' }}>
             <Text h3 style={styles.Title_summary}>{strings('HomeFarm.profit')}:</Text>
             <Block row flex={false} >
-              <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.unitPrice * item.estimatedQuantity - item.estimatedCost } />
-                <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
-              </Block>
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.unitPrice * item.estimatedQuantity - item.estimatedCost} />
+              <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
+            </Block>
           </Block>
         </Block>
       </Block>
@@ -225,134 +267,189 @@ class ProjectDetailScreen extends Component {
       </Block>
     )
   }
-  renderPriceChart = () => {
-    const fill = '#B097F5'
-    const axesSvg = { fontSize: 15, fill: Colors.catalinaBlue };
-    const verticalContentInset = { top: 20, bottom: 20 }
-    const xAxisHeight = 30
-    const data = [
-      { "value": 20000, "label": '1', },
-      { "value": 12000, "label": '2', },
-      { "value": 50000, "label": '3', },
-      { "value": 42000, "label": '4', },
-      { "value": 21000, "label": '5', },
-      { "value": 35000, "label": '5', },
-      { "value": 24000, "label": '6', },
-      { "value": 38000, "label": '7', },
-      { "value": 41000, "label": '8', },
-      { "value": 23000, "label": '9', },
-      { "value": 21000, "label": '10', },
-      { "value": 14000, "label": '11', },
-      { "value": 24000, "label": '12', }]
-    const dataY = data.map(item => item.value)
-    return (
-      <Block row>
-        <YAxis
-          data={dataY}
-          style={{ marginBottom: xAxisHeight, marginHorizontal: 10 }}
-          contentInset={verticalContentInset}
-          svg={axesSvg}
-        />
-        <Block style={{ flex: 1 }}>
-          <BarChart
-            style={{ height: 200 }}
-            spacingInner={0.2}
-            // spacingOuter ={0.2}
-            data={data}
-            yAccessor={({ item }) => item.value}
-            svg={{ fill }}
-            contentInset={verticalContentInset}
-          >
-            <Grid />
-          </BarChart>
-          {/* <Block style={[styles.line, { marginTop: 5 }]}></Block> */}
-          <XAxis
-            style={{ paddingTop: 10 }}
-            data={data}
-            scale={scale.scaleBand}
-            formatLabel={(_, index) => `${data[index].label}`}
-            spacingInner={0.2}
-            // contentInset={{ left: 10, right: 20 }}
-            svg={{ fontSize: 15, fill: Colors.catalinaBlue }}
-          />
-        </Block>
-      </Block>
-    )
+  renderImagePicker = () => {
+    const options = {
+      title: 'Chọn ảnh',
+      cancelButtonTitle: "Thoát",
+      takePhotoButtonTitle: "Chụp ảnh",
+      chooseFromLibraryButtonTitle: "Chọn ảnh từ thư viện",
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        // const source = { };
+        this.setState({
+          imageDataUpdate: response.data,
+          dataImage: response
+        });
+      }
+    });
   }
+  showDatePicker = () => {
+    this.setDatePickerVisibility(true);
+  };
+
+  hideDatePicker = () => {
+    this.setDatePickerVisibility(false);
+  };
+  handleConfirm = birthDate => {
+    this.hideDatePicker();
+    let {ProcessDetail}= this.state
+
+    ProcessDetail.planStartDate = Date.parse(birthDate);
+    this.setState({
+      ProcessDetail
+    })
+  };
+
+  setDatePickerVisibility = isVisible => {
+    this.setState({
+      isVisible,
+    })
+  };
   renderStatistical = () => {
     const { params } = this.props.navigation.state;
+    const { ProcessDetail, } = this.state
+    console.log('ProcessDetail', ProcessDetail)
     return (
       <Block center flex={false} style={styles.statistical}>
         <Block flex={false} style={styles.summaryProcess} >
           {this.renderSummaryProcess(params)}
         </Block>
         <Block flex={false} style={styles.chart}>
-          <Block flex={false} row>
-            <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.priceChart')}</Text>
-            <Block flex={false} center middle style={{ backgroundColor: Colors.white, marginLeft: 10, borderRadius: 10, paddingHorizontal: 10, }}>
-              <Text h3 bold color={"#26C165"}>2020</Text>
+          <Block flex={false} row center style={{ marginVertical: 15, justifyContent: 'space-between' }} >
+            <Text h2 bold>Cập nhật thông tin</Text>
+            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: "center" , borderWidth:1,borderColor:'green', borderRadius:5 }}>
+              <Text h3 bold style={{ marginLeft: 5 , paddingHorizontal:5 }} color={"#26C165"} >Cập nhật</Text>
+            </TouchableOpacity>
+          </Block>
+          <TouchableOpacity onPress={() => this.showDatePicker()}>
+            <Input
+              label={'Thơi gian bắt đầu'}
+              value={ProcessDetail.planStartDate !== '' ? moment(ProcessDetail.planStartDate).format('DD/MM/YYYY') : null}
+              style={styles.input}
+              labelStyle={{ fontSize: 20, color: Colors.catalinaBlue }}
+              onChangeText={text => this.handleChange(text, 'planStartDate')}
+              rightLabel={
+                <Icon
+                  name="calendar"
+                  style={{ position: 'absolute', marginTop: 30 }}
+                  size={30}
+                  onPress={() => this.showDatePicker()}
+                />
+              }
+              editable={false}
+            />
+          </TouchableOpacity>
+          <Block flex={false} style={{ marginTop: 10 }}>
+            <Input
+              label={'Địa chỉ canh tác'}
+              labelStyle={{ fontSize: 20, color: Colors.catalinaBlue }}
+              style={[styles.input]}
+              value={ProcessDetail && ProcessDetail.address ? ProcessDetail.address : ''}
+            // onChangeText={text => this.handleChange(text, 'fullName')}
+            />
+          </Block>
+          <Block flex={false} style={{ marginTop: 10, width: "100%" }}>
+            <Block row flex={false} style={{ justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 20, color: Colors.catalinaBlue }}>Cập nhật hình ảnh: </Text>
+              <TouchableOpacity
+                onPress={() => this.renderImagePicker()}
+              >
+                <Image source={Images.iconAwesomeCamera}></Image>
+              </TouchableOpacity>
+            </Block>
+            <Block flex={false} style={{ height: 200, marginVertical: 10, borderColor: "#D6D6D6", borderWidth: 1, borderRadius: 10 }}>
+              <Image style={{ flex: 1 }} source={this.state.imageDataUpdate !== 'https://imttrade.com/wp-content/uploads/2016/12/white-background-2.jpg' ? { uri: 'data:image/jpeg;base64,' + this.state.imageDataUpdate } : { uri: this.state.imageData }}></Image>
             </Block>
           </Block>
-          <Block flex={false} style={{ marginTop: 10 }}>
-            <Text h3 bold color={Colors.catalinaBlue}>vnđ/kg</Text>
-          </Block>
-          <Block>
-            {this.renderPriceChart()}
-          </Block>
         </Block>
+
       </Block>
     )
   }
   renderItemEstimatesCostPhase = (data) => {
+    const swipeSettings = {
+      autoClose: true,
+      onClose: (secId, rowId, direction) => {
+
+      },
+      onOpen: (secId, rowId, direction) => {
+
+      },
+      rowId: this.props.index,
+      sectionId: 1
+    }
     var workerCost = 0;
     var dataTask = [];
     var workerNum = 0;
     var workerUnitFee = 0;
-    var medium =0;
-    for(var i=0; i<data.length; i++){
+    var medium = 0;
+    for (var i = 0; i < data.length; i++) {
       dataTask = dataTask.concat(data[i].materials)
-      if(data[i].workerNum){
-        workerCost += data[i].workerNum * data[i].workerUnitFee ;
-        workerNum += data[i].workerNum ;
-        workerUnitFee += data[i].workerUnitFee ;
-        medium += 1 ;
+      if (data[i].workerNum) {
+        workerCost += data[i].workerNum * data[i].workerUnitFee;
+        workerNum += data[i].workerNum;
+        workerUnitFee += data[i].workerUnitFee;
+        medium += 1;
       }
     }
-    workerUnitFee = workerUnitFee/medium
+    workerUnitFee = workerUnitFee / medium
     var totalCost = 0;
-    for(var i=0; i<dataTask.length; i++){
+    for (var i = 0; i < dataTask.length; i++) {
       totalCost += dataTask[i].actualQuantity * dataTask[i].actualUnitPrice
     }
+    console.log('nl', dataTask)
     totalCost += workerCost
     return (
       <Block flex={false} >
         <Block center flex={false} style={styles.ItemEstimatesPhase}>
-          <Block flex={false}><Image source={Images.worker} tintColor={Colors.green} style={{ resizeMode: "stretch", marginRight: 20, height:20,width:20 }}></Image></Block>
+          <Block flex={false}><Image source={Images.worker} tintColor={Colors.green} style={{ resizeMode: "stretch", marginRight: 20, height: 20, width: 20 }}></Image></Block>
           <Block row style={{ justifyContent: 'space-between' }}>
             <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
               <Text h3 bold color={Colors.catalinaBlue}>Nhân công</Text>
               <Text h3 semibold color={Colors.catalinaBlue}>{workerNum}x{workerUnitFee}</Text>
             </Block>
             <Block row flex={false}>
-              <TextCurrency h3 bold color={Colors.catalinaBlue} value={workerCost}/>
+              <TextCurrency h3 bold color={Colors.catalinaBlue} value={workerCost} />
               <Text h4 bold color={Colors.catalinaBlue}>đ</Text>
-            </Block>           
-          </Block>
-        </Block>
-        {dataTask.map((item) =>
-          <Block key={item._id}  center flex={false} style={styles.ItemEstimatesPhase}>
-            <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
-            <Block row style={{ justifyContent: 'space-between' }}>
-              <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
-                <Text h3 bold color={Colors.catalinaBlue} numberOfLines={1} ellipsizeMode={'tail'} style={{width:110}}>{item.name}</Text>
-                <Text h3 semibold color={Colors.catalinaBlue}>{item.actualQuantity}x{item.actualUnitPrice}</Text>
-              </Block>
-              <Block row flex={false}>
-                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.actualQuantity * item.actualUnitPrice}/>
-                <Text h4 bold color={Colors.catalinaBlue}> đ</Text>
-              </Block>
             </Block>
           </Block>
+        </Block>
+        {dataTask.map((item, index) =>
+          <Swipeout {...swipeSettings} right={[
+            {
+              onPress: () => {
+                console.log(item)
+              },
+              text: 'Delete', type: 'delete'
+            }
+          ]} backgroundColor={'while'}>
+            <Block key={index} center flex={false} style={styles.ItemEstimatesPhase}>
+              <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
+              <Block row style={{ justifyContent: 'space-between' }}>
+                <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
+                  <Text h3 bold color={Colors.catalinaBlue} numberOfLines={1} ellipsizeMode={'tail'} style={{ width: 110 }}>{item.name}</Text>
+                  <Text h3 semibold color={Colors.catalinaBlue}>{item.actualQuantity}x{item.actualUnitPrice}</Text>
+                </Block>
+                <Block row flex={false}>
+                  <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.actualQuantity * item.actualUnitPrice} />
+                  <Text h4 bold color={Colors.catalinaBlue}> đ</Text>
+                </Block>
+              </Block>
+            </Block>
+          </Swipeout>
         )}
         <Block flex={false} row right style={{ marginVertical: 10 }}>
           <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.total')}: </Text>
@@ -362,32 +459,32 @@ class ProjectDetailScreen extends Component {
       </Block>
     )
   }
-  sayHelloHandle = (data) =>{
+  sayHelloHandle = (data) => {
     console.log(data)
   }
-  updateListTasks =(data) => {
+  updateListTasks = (data) => {
     this.setState({
       updateTask: data
     });
   }
   renderItemEstimatesCostProcess = (data) => {
-    const {planStartDate,time} = this.state
+    const { planStartDate, time } = this.state
     var dataTask = []
-    for(var i=0; i<data.length; i++){
+    for (var i = 0; i < data.length; i++) {
       dataTask = dataTask.concat(data[i].tasks)
     }
-    var dataMaterials =[]
-    for(var i=0; i<dataTask.length; i++){
+    var dataMaterials = []
+    for (var i = 0; i < dataTask.length; i++) {
       dataMaterials = dataMaterials.concat(dataTask[i].materials)
     }
     var totalCost = 0;
     var workerCost = 0
-    for(var i=0; i<dataMaterials.length; i++){
+    for (var i = 0; i < dataMaterials.length; i++) {
       totalCost += dataMaterials[i].quantity * dataMaterials[i].unitPrice
     }
-    for(var i=0; i<dataTask.length; i++){
-      if(dataTask[i].workerNum){
-        workerCost += dataTask[i].workerNum * dataTask[i].workerUnitFee ;
+    for (var i = 0; i < dataTask.length; i++) {
+      if (dataTask[i].workerNum) {
+        workerCost += dataTask[i].workerNum * dataTask[i].workerUnitFee;
       }
     }
     totalCost += workerCost
@@ -396,7 +493,7 @@ class ProjectDetailScreen extends Component {
         <Block flex={false} style={styles.totalCostOfPhase}>
           <Text h3 bold color={Colors.white}>{strings('Process.totalCost')} :</Text>
           <Block row flex={false}>
-            <TextCurrency h3 bold color={Colors.white} value={totalCost}/>
+            <TextCurrency h3 bold color={Colors.white} value={totalCost} />
             <Text h3 bold color={Colors.white}> vnđ</Text>
           </Block>
         </Block>
@@ -425,7 +522,7 @@ class ProjectDetailScreen extends Component {
     )
   }
   renderEstimatesCostProcess = () => {
-    const {phases} = this.state.ProcessDetail
+    const { phases } = this.state.ProcessDetail
     return (
       <Block flex={false} style={styles.renderContent}>
         {this.renderItemEstimatesCostProcess(phases)}
@@ -439,34 +536,34 @@ class ProjectDetailScreen extends Component {
       </Block>
     )
   }
-  renderTask = (data,startPhase,endPhase) => {
+  renderTask = (data, startPhase, endPhase) => {
     const { params } = this.props.navigation.state;
     const idProcess = params._id;
     const { navigation } = this.props;
     const { updateTask } = this.state;
     let timeTask = [];
-    if(updateTask && updateTask!==null){
+    if (updateTask && updateTask !== null) {
       data.push(updateTask);
       this.setState({
-      updateTask: null
-    })
+        updateTask: null
+      })
     }
-    if (data&& data.length !== 0){
+    if (data && data.length !== 0) {
       var start = 0;
       var end = startPhase;
-      for(var i=0;i<data.length;i++){
+      for (var i = 0; i < data.length; i++) {
         start = end
-        end += data[i].estimatedTime * 24 * 60 * 60 * 1000 
-        timeTask.push({start:start, end:end});
+        end += data[i].estimatedTime * 24 * 60 * 60 * 1000
+        timeTask.push({ start: start, end: end });
       }
     }
     return (
       <Block flex={false}>
-        {data.map((item,index) =>
-          <Block  key={item._id} center flex={false} row style={{ marginBottom: 10 }} >
+        {data.map((item, index) =>
+          <Block key={item._id} center flex={false} row style={{ marginBottom: 10 }} >
             <Block flex={false} style={styles.dot} />
             <TouchableOpacity style={styles.task}
-              onPress={() => navigation.navigate(Screens.TASK_PROJECT,{item,startTask:timeTask[index].start,endTask:timeTask[index].end,idProcess,sayHello: this.sayHelloHandle})}
+              onPress={() => navigation.navigate(Screens.TASK_PROJECT, { item, startTask: timeTask[index].start, endTask: timeTask[index].end, idProcess, sayHello: this.sayHelloHandle })}
             >
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
               <Block row flex={false}>
@@ -484,11 +581,11 @@ class ProjectDetailScreen extends Component {
     const { navigation } = this.props;
     var listTask = [];
     var idphase = ''
-    if(data){
-      listTask=data.tasks
-      idphase=data._id
-    } 
-    const {planStartDate, time , Index} = this.state
+    if (data) {
+      listTask = data.tasks
+      idphase = data._id
+    }
+    const { planStartDate, time, Index } = this.state
     return (
       <Block flex={false} style={styles.renderContent}>
         <Text h2 bold color={Colors.catalinaBlue}>{data.name}</Text>
@@ -498,12 +595,12 @@ class ProjectDetailScreen extends Component {
           </Block>
           <Block row flex={false}>
             <Text h3 bold color={Colors.catalinaBlue}>Từ : </Text>
-            <Text h3 bold color={Colors.catalinaBlue}>{moment(time[Index-3].start).format('DD/MM/YYYY')}</Text>
+            <Text h3 bold color={Colors.catalinaBlue}>{moment(time[Index - 3].start).format('DD/MM/YYYY')}</Text>
           </Block>
           <Text> - </Text>
           <Block row flex={false}>
             <Text h3 bold color={Colors.catalinaBlue}>Đến : </Text>
-            <Text h3 bold color={Colors.catalinaBlue}>{moment(time[Index-3].end).format('DD/MM/YYYY')}</Text>
+            <Text h3 bold color={Colors.catalinaBlue}>{moment(time[Index - 3].end).format('DD/MM/YYYY')}</Text>
           </Block>
         </Block>
         <Block flex={false} style={styles.estimatesPhase}>
@@ -524,16 +621,16 @@ class ProjectDetailScreen extends Component {
             </Block>
             <Block row center style={{ justifyContent: 'space-between' }} >
               <Text h3 bold color={"#26C165"}>{strings('Process.task')}</Text>
-              <TouchableOpacity style={{flexDirection:'row',justifyContent:"center"}}
-              onPress={() => navigation.navigate(Screens.ADD_TASK,{idphase,updateListTasks:this.updateListTasks})}
+              <TouchableOpacity style={{ flexDirection: 'row', justifyContent: "center" }}
+                onPress={() => navigation.navigate(Screens.ADD_TASK, { idphase, updateListTasks: this.updateListTasks })}
               >
                 <Icon name="plus-circle" size={21} color={Colors.green} />
-                <Text h3 style={{marginLeft:5}} color={"#26C165"} >{strings('Project.addTask')}</Text>
+                <Text h3 style={{ marginLeft: 5 }} color={"#26C165"} >{strings('Project.addTask')}</Text>
               </TouchableOpacity>
             </Block>
           </Block>
           <Block flex={false}>
-            {this.renderTask(listTask,time[Index-3].start,time[Index-3].end)}
+            {this.renderTask(listTask, time[Index - 3].start, time[Index - 3].end)}
           </Block>
         </Block>
       </Block>
@@ -543,7 +640,7 @@ class ProjectDetailScreen extends Component {
 
   }
   renderContentprocess = () => {
-    const {phases} = this.state.ProcessDetail
+    const { phases } = this.state.ProcessDetail
     const index = this.state.Index
     switch (index) {
       case 0:
@@ -566,12 +663,12 @@ class ProjectDetailScreen extends Component {
         );
       default:
         var data = {}
-        if(phases){
-          for(var i = 0;i<phases.length;i++){
-          if(index === i+3){
-            data =phases[i]
+        if (phases) {
+          for (var i = 0; i < phases.length; i++) {
+            if (index === i + 3) {
+              data = phases[i]
+            }
           }
-        }
         }
         return (
           <Block flex={false} >
@@ -580,18 +677,35 @@ class ProjectDetailScreen extends Component {
         )
     }
   }
+  onRefresh = () => {
+		const {} = this.props;
+		this.handleFilterSortProcess();
+	};
+
+	handleFilterSortProcess = () => {
+    const { params } = this.props.navigation.state;
+    const idProcess = params._id;
+    const { processActions } = this.props;
+    processActions.fetchProcessDetail(idProcess);
+		this.setState({
+			isEditing: true,
+		});
+	};
   render() {
     const { navigation } = this.props;
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
-    const {ProcessDetail, time,planStartDate} = this.state
-    const {phases} = ProcessDetail
-    if (phases&& phases.length !== 0){
+    const { ProcessDetail, time, planStartDate, isOpen } = this.state
+    const { phases } = ProcessDetail
+    const { isVisible,refreshing } = this.state;
+
+    const dateTimePicker = ProcessDetail.planStartDate
+    if (phases && phases.length !== 0) {
       var start = 0;
-      var end = planStartDate;
-      for(var i=0;i<phases.length;i++){
+      var end = ProcessDetail.planStartDate;
+      for (var i = 0; i < phases.length; i++) {
         start = end
-        end += phases[i].estimatedTime * 24 * 60 * 60 * 1000 
-        time.push({start:start, end:end});
+        end += phases[i].estimatedTime * 24 * 60 * 60 * 1000
+        time.push({ start: start, end: end });
         // console.log('start',moment(start).format('DD/MM/YYYY'))
         // console.log('end',moment(end).format('DD/MM/YYYY'))
       }
@@ -605,32 +719,48 @@ class ProjectDetailScreen extends Component {
     return (
       <Block>
         <ScrollView style={styles.container}
-            onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]
-            )}
-          >
-            <Block flex={false} style={styles.bar}>
-              <Block column flex={false} style={{ paddingHorizontal: 5, paddingTop: 30, }}>
-                <Block center middle flex={false} style={styles.carousel}>
-                  {this.renderCarousel()}
-                </Block>
-                <Block flex={false} style={styles.slidePhase}>
-                  {this.renderSlidePhase()}
-                </Block>
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]
+          )}
+          refreshControl={
+							<RefreshControl
+								//refresh control used for the Pull to Refresh
+								refreshing={refreshing}
+								onRefresh={() => this.onRefresh()}
+							/>
+						}
+        >
+          <Block flex={false} style={styles.bar}>
+            <Block column flex={false} style={{ paddingHorizontal: 5, paddingTop: 30, }}>
+              <Block center middle flex={false} style={styles.carousel}>
+                {this.renderCarousel()}
+              </Block>
+              <Block flex={false} style={styles.slidePhase}>
+                {this.renderSlidePhase()}
               </Block>
             </Block>
-            {/* render centent */}
-            {this.renderContentprocess()}
-            <Block flex={false} style={styles.questions}>
-              <Block row center flex={false}>
-                <Block center middle flex={false} style={{ height: 40, width: 40 }}>
-                  <Image source={Images.iconQuestion} style={{ resizeMode: 'stretch', height: 27, width: 27 }}></Image>
+          </Block>
+          {/* render centent */}
+          {this.renderContentprocess()}
+          <Block flex={false} style={styles.questions}>
+            <Block row center flex={false}>
+              <Block center middle flex={false} style={{ height: 40, width: 40 }}>
+                <Image source={Images.iconQuestion} style={{ resizeMode: 'stretch', height: 27, width: 27 }}></Image>
               </Block>
               <Text h2 color={"#26C165"}>{strings('Process.questions')}</Text>
             </Block>
             {this.renderQuestions()}
           </Block>
         </ScrollView>
+        {isVisible && (
+          <DateTimePickerModal
+            isVisible={isVisible}
+            mode="date"
+            onConfirm={this.handleConfirm}
+            onCancel={this.hideDatePicker}
+            date={dateTimePicker}
+          />
+        )}
         <Animated.View style={[styles.header, { transform: [{ translateY: headerTranslate }] }]}  >
           <Header
             isShowBack
@@ -645,6 +775,13 @@ class ProjectDetailScreen extends Component {
           <Text h3 bold color={Colors.white}>Triển</Text>
           <Text h3 bold color={Colors.white}>khai</Text>
         </TouchableOpacity> */}
+        <BaseModal
+          isOpen={isOpen}
+          bodyModal={this.renderBodyModal}
+          footerModal={this.renderFooterModal}
+          onCancel={this.handleCloseModal}
+          useScrollView={true}
+        />
       </Block>
 
     )

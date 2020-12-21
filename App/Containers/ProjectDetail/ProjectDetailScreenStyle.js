@@ -199,7 +199,6 @@ export default StyleSheet.create({
     task: {
         flex: 1,
         paddingVertical: 10,
-        backgroundColor: "#E7F8FD",
         marginLeft: 10,
         borderRadius: 10,
         paddingHorizontal: 10,

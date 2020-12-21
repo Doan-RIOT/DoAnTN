@@ -23,6 +23,7 @@ import PropTypes, { number, string } from 'prop-types';
 import RNFetchBlob from 'rn-fetch-blob';
 import { Config } from '../../Config';
 import Toast, { DURATION } from 'react-native-easy-toast';
+
 import {
   getToken,
   getUserName,
@@ -123,24 +124,6 @@ class TaskProjectDetailScreen extends Component {
     const { msgError } = this.state;
     return (
       <Block>
-        <Toast
-          ref="toastSuccess"
-          style={{ backgroundColor: Colors.green }}
-          position='top'
-          positionValue={200}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-        />
-        <Toast
-          ref="toastFailed"
-          style={{ backgroundColor: Colors.accent }}
-          position='top'
-          positionValue={200}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-        />
         <Text error>{msgError}</Text>
         <Block flex={false}>
           <Input
@@ -302,6 +285,7 @@ class TaskProjectDetailScreen extends Component {
             if (response) {
               console.log('res', response)
               dataTask.materials.push(response)
+              this.refs.toastSuccess.show('Thêm nguyên vật liệu thành công', DURATION.LENGTH_LONG);
               this.setState({
                 isOpen: false,
                 dataTask
@@ -358,6 +342,7 @@ class TaskProjectDetailScreen extends Component {
             if (response) {
               console.log('res', response)
               dataTask.measurements.push(response)
+              this.refs.toastSuccess.show('Thêm số liệu đo đạc thành công', DURATION.LENGTH_LONG);
               this.setState({
                 isOpenMeasurements: false,
                 dataTask
@@ -386,12 +371,33 @@ class TaskProjectDetailScreen extends Component {
     })
   }
   handleUpdate = async () => {
+    const { idProcess } = this.props.navigation.state.params;
+    const { processActions } = this.props;
     this.props.navigation.state.params.sayHello("hello")
     const token = await getToken();
     const { dataImage, dataTask } = this.state
     // // const {dataTaskUpdate} = this.state
-    console.log('dataTask._id', dataTask._id)
-    console.log('token', dataImage.type)
+    var data = {
+      _id: dataTask._id,
+      note: dataTask.note
+    }
+    if (token) {
+      try {
+        cardsService.updateTask(data, token)
+          .then(response => {
+            if (response) {
+              console.log('update done')
+              processActions.fetchProcessDetail(idProcess);
+              this.refs.toastSuccess.show('Cập nhật thành công', DURATION.LENGTH_LONG);
+            } else {
+              console.log('err1')
+            }
+          });
+      } catch (error) {
+        console.log('err2')
+      }
+    }
+
     RNFetchBlob.fetch('POST', Config.API_URL + "/task/uploadImages", {
       Authorization: "Bearer " + token,
       "Content-Type": "multipart/form-data"
@@ -572,6 +578,13 @@ class TaskProjectDetailScreen extends Component {
       dataTaskUpdate,
     })
   }
+  handleChangeNote = (value, key) => {
+    let { dataTask } = this.state;
+    dataTask[key] = value;
+    this.setState({
+      dataTask,
+    })
+  }
   renderItemSLDD = (data) => {
     return (
       <Block flex={false} >
@@ -677,6 +690,9 @@ class TaskProjectDetailScreen extends Component {
             <Block center midle flex={false}>
               <Text h1 bold>Công việc</Text>
             </Block>
+            <Block center midle flex={false}>
+              <Text h3 >{dataTask.name}</Text>
+            </Block>
             <Block midle flex={false} style={{ paddingHorizontal: 20 }}>
               <Text h2 bold style={{ marginVertical: 10 }}>Mô tả: </Text>
               <Text h3>{dataTask.description}</Text>
@@ -715,7 +731,8 @@ class TaskProjectDetailScreen extends Component {
               <Text h3 bold style={{ marginVertical: 10 }}>Cập nhật tình trạng: </Text>
               <Input
                 style={[styles.input,]}
-                onChangeText={text => this.handleChange(text, 'note')}
+                value={dataTask.note}
+                onChangeText={text => this.handleChangeNote(text, 'note')}
               />
             </Block>
             <Block flex={false} style={{ marginTop: 20, marginHorizontal: 20 }}>
@@ -732,6 +749,24 @@ class TaskProjectDetailScreen extends Component {
               </Block>
             </Block>
           </Block>
+          <Toast
+            ref="toastSuccess"
+            style={{ backgroundColor: Colors.green }}
+            position='top'
+            positionValue={200}
+            fadeInDuration={750}
+            fadeOutDuration={1000}
+            opacity={0.8}
+          />
+          <Toast
+            ref="toastFailed"
+            style={{ backgroundColor: Colors.accent }}
+            position='top'
+            positionValue={200}
+            fadeInDuration={750}
+            fadeOutDuration={1000}
+            opacity={0.8}
+          />
         </ScrollView>
         <Animated.View style={[styles.header, { transform: [{ translateY: headerTranslate }] }]}  >
           <Header

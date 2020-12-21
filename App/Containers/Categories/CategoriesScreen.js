@@ -79,9 +79,9 @@ class CategoriesScreen extends Component {
               <Text h3 bold>{moment(item.planStartDate+(item.estimatedTime*30*24*60*60*1000)).format('DD/MM/YYYY')}</Text>
             </Block>
           </Block>
-          <Block flex={false} style={styles.progress}>
-            <Text h3 bold>Tiến độ</Text>
-            {this.renderSlidePhase()}
+          <Block row flex={false} center style={styles.progress}>
+            <Text h3 bold color={Colors.green}>Đạt chuẩn:  </Text>
+            <Text h3 bold>{item.standardGap[0]}</Text>
           </Block>
         </Block>
         <Block flex={false} row style={styles.statistical}>

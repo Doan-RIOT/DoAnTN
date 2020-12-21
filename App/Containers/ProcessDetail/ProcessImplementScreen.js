@@ -67,7 +67,7 @@ class ProcessImplementScreen extends Component {
         console.log("err" ,res.data)
       }else{
         navigation.navigate(Screens.CARD);
-        console.log("data" ,res.data)
+        // console.log("data" ,res.data)
         cardsActions.fetchProject();
       }
     })

@@ -31,35 +31,35 @@ class CardScreen extends Component {
       cards: {},
       typeCode: 'barCode',
       scrollY: new Animated.Value(0),
-      listProject:[],
+      listProject: [],
       refreshing: false,
     }
   }
   componentDidMount() {
     //API redux
-    const { cardsActions,project } = this.props
+    const { cardsActions, project } = this.props
     cardsActions.fetchProject();
     // console.log('ListProject',project)
     // this.setState({ listProject : project})
   }
-  UNSAFE_componentWillUpdate (nextProps) {
-    const {project}=this.props
-    if(nextProps.project!==project){
-      this.setState({listProject:nextProps.project})
+  UNSAFE_componentWillUpdate(nextProps) {
+    const { project } = this.props
+    if (nextProps.project !== project) {
+      this.setState({ listProject: nextProps.project })
     }
   }
   renderItemProject(item) {
     const { navigation } = this.props;
     var image = item.images[0]
     var url = Config.API_URL
-    if(image){
-      image=image.replace("http://localhost:3000",url)
+    if (image) {
+      image = image.replace("http://localhost:3000", url)
     }
     return (
       <TouchableOpacity key={item._id} style={styles.container}
-      onPress={() => navigation.navigate(Screens.PROJECT, item)}
+        onPress={() => navigation.navigate(Screens.PROJECT, item)}
       >
-        <Image style={styles.image} source={{ uri: image?image:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1778&q=80" }} />
+        <Image style={styles.image} source={{ uri: image ? image : "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1778&q=80" }} />
         <Block style={styles.summary}>
           <Text h2 >{item.name} </Text>
           <Block row flex={false} style={styles.timePlan}>
@@ -69,21 +69,21 @@ class CardScreen extends Component {
             </Block>
             <Block center>
               <Text h3 bold>Kết thúc</Text>
-              <Text h3 bold>{moment(item.planStartDate+(item.estimatedTime*30*24*60*60*1000)).format('DD/MM/YYYY')}</Text>
+              <Text h3 bold>{moment(item.planStartDate + (item.estimatedTime * 30 * 24 * 60 * 60 * 1000)).format('DD/MM/YYYY')}</Text>
             </Block>
           </Block>
-          <Block flex={false} style={styles.progress}>
-            <Text h3 bold>Tiến độ</Text>
-            {this.renderSlidePhase()}
+          <Block flex={false} row style={styles.progress}>
+            <Text h3 bold color={Colors.green}>Đạt chuẩn:  </Text>
+            <Text h3 bold>{item.standardGap[0]}</Text>
           </Block>
         </Block>
         <Block flex={false} row style={styles.statistical}>
-          <Block  color={"#B8CEC9"} style={{ borderRadius: 5,paddingHorizontal:20}}>
+          <Block color={"#B8CEC9"} style={{ borderRadius: 5, paddingHorizontal: 20 }}>
             <Block center middle flex={false} >
               <Text h2 bold color={Colors.catalinaBlue}>Dự toán</Text>
             </Block>
             <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image style={{marginLeft: 5 }} source={Images.iconLand}></Image>
+              <Image style={{ marginLeft: 5 }} source={Images.iconLand}></Image>
               <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue}> Quy mô</Text>
                 <Text h3 bold color={Colors.catalinaBlue}>{item.minimalScale} {item.standardUnit}</Text>
@@ -91,7 +91,7 @@ class CardScreen extends Component {
             </Block>
             <Block flex={false} style={styles.line}></Block>
             <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image style={{marginLeft: 5 }} source={Images.iconSanLuong}></Image>
+              <Image style={{ marginLeft: 5 }} source={Images.iconSanLuong}></Image>
               <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue}> Chi phí</Text>
                 <Block row flex={false} >
@@ -102,7 +102,7 @@ class CardScreen extends Component {
             </Block>
             <Block flex={false} style={styles.line}></Block>
             <Block center middle row flex={false} style={{ paddingVertical: 5 }}>
-              <Image style={{marginLeft: 5 }} source={Images.iconInvest}></Image>
+              <Image style={{ marginLeft: 5 }} source={Images.iconInvest}></Image>
               <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue}>Sản lượng</Text>
                 <Text h3 bold color={Colors.catalinaBlue}>{item.estimatedQuantity} kg</Text>
@@ -114,7 +114,7 @@ class CardScreen extends Component {
               <Block center middle row style={{ justifyContent: 'space-between', marginLeft: 10 }}>
                 <Text h3 bold color={Colors.catalinaBlue}>Lợi nhuận</Text>
                 <Block row flex={false} >
-                  <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.unitPrice * item.estimatedQuantity - item.estimatedCost } />
+                  <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.unitPrice * item.estimatedQuantity - item.estimatedCost} />
                   <Text h3 bold color={Colors.catalinaBlue}> vnđ</Text>
                 </Block>
               </Block>
@@ -128,7 +128,7 @@ class CardScreen extends Component {
     const data = this.state.listProject;
     return (
       <Block center style={{ marginTop: 60 }}>
-        {data && data.length > 0 ?(data.map((item) => this.renderItemProject(item))):null}
+        {data && data.length > 0 ? (data.map((item) => this.renderItemProject(item))) : null}
       </Block>
     );
   }
@@ -169,19 +169,19 @@ class CardScreen extends Component {
     // console.log(this.state.Index)
   }
   onRefresh = () => {
-		const {} = this.props;
-		this.handleFilterSortProcess();
-	};
+    const { } = this.props;
+    this.handleFilterSortProcess();
+  };
 
-	handleFilterSortProcess = () => {
-    const { processActions} = this.props
+  handleFilterSortProcess = () => {
+    const { processActions } = this.props
     // processActions.fetchListProcess();
-		// this.setState({
-		// 	isEditing: true,
-		// });
-	};
+    // this.setState({
+    // 	isEditing: true,
+    // });
+  };
   render() {
-    const {refreshing} = this.state
+    const { refreshing } = this.state
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
     const headerTranslate = diffClamp.interpolate({
       inputRange: [0, 45],
@@ -192,12 +192,12 @@ class CardScreen extends Component {
       <Block style={{}}>
         <ScrollView
           refreshControl={
-							<RefreshControl
-								//refresh control used for the Pull to Refresh
-								refreshing={refreshing}
-								onRefresh={() => this.onRefresh()}
-							/>
-						}
+            <RefreshControl
+              //refresh control used for the Pull to Refresh
+              refreshing={refreshing}
+              onRefresh={() => this.onRefresh()}
+            />
+          }
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]
           )}>
@@ -206,7 +206,7 @@ class CardScreen extends Component {
         <Animated.View style={[styles.header, { transform: [{ translateY: headerTranslate }] }]}  >
           <Header
             title={'Dự án của tôi'}
-            >
+          >
           </Header>
         </Animated.View>
       </Block>

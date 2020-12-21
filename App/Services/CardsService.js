@@ -34,6 +34,34 @@ function updateMeasurements (data,token) {
   headers: {"Authorization": `Bearer ${token}`}
 })
 }
+
+function updateProject (data,token) {
+  return Axios.put(`${Config.API_URL}/project/update`, {
+    "_id": data._id, 
+    "planStartDate": data.planStartDate,
+    "address": data.address
+  }, {
+  headers: {"Authorization": `Bearer ${token}`}
+})
+}
+function updateProjectEnd (data,token) {
+  return Axios.put(`${Config.API_URL}/project/update`, {
+    "_id": data._id, 
+    "isFinished": data.isFinished,
+  }, {
+  headers: {"Authorization": `Bearer ${token}`}
+})
+}
+
+function updateTask (data,token) {
+  return Axios.put(`${Config.API_URL}/task/update`, {
+    "_id": data._id, 
+    "note": data.note
+  }, {
+  headers: {"Authorization": `Bearer ${token}`}
+})
+}
+
 function updateMaterial (data,token) {
   console.log(data)
   return Axios.put(`${Config.API_URL}/material/update`,data, {
@@ -48,5 +76,8 @@ export const cardsService = {
   updateMeasurements,
   updateMaterial,
   createMaterial,
-  createMeasurements
+  createMeasurements,
+  updateProject,
+  updateTask,
+  updateProjectEnd
 }

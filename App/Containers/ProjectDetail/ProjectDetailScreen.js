@@ -24,6 +24,16 @@ import ImagePicker from 'react-native-image-picker';
 import Swipeout from 'react-native-swipeout';
 import { Directions } from 'react-native-gesture-handler';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { cardsService } from '../../Services/CardsService';
+import Toast, { DURATION } from 'react-native-easy-toast';
+import CategoriesActions from '../../Stores/Categories/Actions';
+import CardsActions from '../../Stores/Card/Actions';
+import {
+  getToken,
+  getUserName,
+  getPassword,
+  resetUser,
+} from "../../Utils/storage.helper";
 const { width } = Dimensions.get('window');
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -47,6 +57,8 @@ class ProjectDetailScreen extends Component {
       isVisible: false,
       startDay: "",
       refreshing: false,
+      dataProjectUpdate: {},
+      endPhaseSlide: 0
     }
   }
   componentDidMount() {
@@ -115,7 +127,7 @@ class ProjectDetailScreen extends Component {
       }
     }
     const summaryProcess = summary.concat(process);
-    // summaryProcess.push("Kết thúc")
+    summaryProcess.push("Kết thúc")
     return (
       <Block flex={false} style={{ height: 100 }} >
         <FlatList
@@ -176,6 +188,7 @@ class ProjectDetailScreen extends Component {
     })
   };
   handleIndexContentProcess = Index => {
+    console.log('index', Index)
     this.setState({
       Index
     });
@@ -305,7 +318,7 @@ class ProjectDetailScreen extends Component {
   };
   handleConfirm = birthDate => {
     this.hideDatePicker();
-    let {ProcessDetail}= this.state
+    let { ProcessDetail } = this.state
 
     ProcessDetail.planStartDate = Date.parse(birthDate);
     this.setState({
@@ -318,9 +331,57 @@ class ProjectDetailScreen extends Component {
       isVisible,
     })
   };
+  handleChange = (value, key) => {
+    let { ProcessDetail } = this.state;
+    ProcessDetail[key] = value;
+    this.setState({
+      ProcessDetail
+    })
+  }
+  handleUpdateProject = async () => {
+    const { params } = this.props.navigation.state;
+    const idProcess = params._id;
+    const { processActions } = this.props;
+    const token = await getToken();
+    let { ProcessDetail } = this.state;
+    console.log('ud', ProcessDetail.address)
+    console.log('udd', ProcessDetail.planStartDate)
+    let dataUpdate = {
+      "_id": ProcessDetail._id,
+      "planStartDate": ProcessDetail.planStartDate,
+      "address": ProcessDetail.address
+    }
+    console.log('update', dataUpdate)
+    if (token) {
+      try {
+        cardsService.updateProject(dataUpdate, token)
+          .then(response => {
+            if (response) {
+              console.log('update done', response)
+              // processActions.fetchProcessDetail(idProcess);
+              processActions.fetchProcessDetail(idProcess);
+              this.refs.toastSuccess.show('Cập nhật thành công', DURATION.LENGTH_LONG);
+            } else {
+              console.log('err1')
+            }
+          });
+      } catch (error) {
+        console.log('err2')
+      }
+    }
+  }
   renderStatistical = () => {
     const { params } = this.props.navigation.state;
-    const { ProcessDetail, } = this.state
+    const { ProcessDetail } = this.state
+    var images = ProcessDetail.images
+    var url = Config.API_URL
+    var imageproject = null
+    if (images) {
+      for (var i = 0; i < images.length; i++) {
+        images[i] = images[i].replace("http://localhost:3000", url);
+        imageproject = images[0]
+      }
+    }
     console.log('ProcessDetail', ProcessDetail)
     return (
       <Block center flex={false} style={styles.statistical}>
@@ -330,8 +391,10 @@ class ProjectDetailScreen extends Component {
         <Block flex={false} style={styles.chart}>
           <Block flex={false} row center style={{ marginVertical: 15, justifyContent: 'space-between' }} >
             <Text h2 bold>Cập nhật thông tin</Text>
-            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: "center" , borderWidth:1,borderColor:'green', borderRadius:5 }}>
-              <Text h3 bold style={{ marginLeft: 5 , paddingHorizontal:5 }} color={"#26C165"} >Cập nhật</Text>
+            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: "center", borderWidth: 1, borderColor: 'green', borderRadius: 5 }}
+              onPress={() => this.handleUpdateProject()}
+            >
+              <Text h3 bold style={{ marginLeft: 5, paddingHorizontal: 5 }} color={"#26C165"} >Cập nhật</Text>
             </TouchableOpacity>
           </Block>
           <TouchableOpacity onPress={() => this.showDatePicker()}>
@@ -358,7 +421,7 @@ class ProjectDetailScreen extends Component {
               labelStyle={{ fontSize: 20, color: Colors.catalinaBlue }}
               style={[styles.input]}
               value={ProcessDetail && ProcessDetail.address ? ProcessDetail.address : ''}
-            // onChangeText={text => this.handleChange(text, 'fullName')}
+              onChangeText={text => this.handleChange(text, 'address')}
             />
           </Block>
           <Block flex={false} style={{ marginTop: 10, width: "100%" }}>
@@ -371,26 +434,32 @@ class ProjectDetailScreen extends Component {
               </TouchableOpacity>
             </Block>
             <Block flex={false} style={{ height: 200, marginVertical: 10, borderColor: "#D6D6D6", borderWidth: 1, borderRadius: 10 }}>
-              <Image style={{ flex: 1 }} source={this.state.imageDataUpdate !== 'https://imttrade.com/wp-content/uploads/2016/12/white-background-2.jpg' ? { uri: 'data:image/jpeg;base64,' + this.state.imageDataUpdate } : { uri: this.state.imageData }}></Image>
+              <Image style={{ flex: 1 }} source={{ uri: imageproject }}></Image>
             </Block>
           </Block>
         </Block>
-
+        <Toast
+          ref="toastFailed"
+          style={{ backgroundColor: Colors.accent }}
+          position='top'
+          positionValue={200}
+          fadeInDuration={750}
+          fadeOutDuration={1000}
+          opacity={0.8}
+        />
+        <Toast
+          ref="toastSuccess"
+          style={{ backgroundColor: Colors.green }}
+          position='top'
+          positionValue={200}
+          fadeInDuration={750}
+          fadeOutDuration={1000}
+          opacity={0.8}
+        />
       </Block>
     )
   }
   renderItemEstimatesCostPhase = (data) => {
-    const swipeSettings = {
-      autoClose: true,
-      onClose: (secId, rowId, direction) => {
-
-      },
-      onOpen: (secId, rowId, direction) => {
-
-      },
-      rowId: this.props.index,
-      sectionId: 1
-    }
     var workerCost = 0;
     var dataTask = [];
     var workerNum = 0;
@@ -428,28 +497,19 @@ class ProjectDetailScreen extends Component {
           </Block>
         </Block>
         {dataTask.map((item, index) =>
-          <Swipeout {...swipeSettings} right={[
-            {
-              onPress: () => {
-                console.log(item)
-              },
-              text: 'Delete', type: 'delete'
-            }
-          ]} backgroundColor={'while'}>
-            <Block key={index} center flex={false} style={styles.ItemEstimatesPhase}>
-              <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
-              <Block row style={{ justifyContent: 'space-between' }}>
-                <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
-                  <Text h3 bold color={Colors.catalinaBlue} numberOfLines={1} ellipsizeMode={'tail'} style={{ width: 110 }}>{item.name}</Text>
-                  <Text h3 semibold color={Colors.catalinaBlue}>{item.actualQuantity}x{item.actualUnitPrice}</Text>
-                </Block>
-                <Block row flex={false}>
-                  <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.actualQuantity * item.actualUnitPrice} />
-                  <Text h4 bold color={Colors.catalinaBlue}> đ</Text>
-                </Block>
+          <Block key={index} center flex={false} style={styles.ItemEstimatesPhase}>
+            <Block flex={false}><Image source={Images.iconMaterial} style={{ resizeMode: "stretch", marginRight: 20 }}></Image></Block>
+            <Block row style={{ justifyContent: 'space-between' }}>
+              <Block row style={{ justifyContent: 'space-between', marginRight: 10 }}>
+                <Text h3 bold color={Colors.catalinaBlue} numberOfLines={1} ellipsizeMode={'tail'} style={{ width: 110 }}>{item.name}</Text>
+                <Text h3 semibold color={Colors.catalinaBlue}>{item.actualQuantity}x{item.actualUnitPrice}</Text>
+              </Block>
+              <Block row flex={false}>
+                <TextCurrency h3 bold color={Colors.catalinaBlue} value={item.actualQuantity * item.actualUnitPrice} />
+                <Text h4 bold color={Colors.catalinaBlue}> đ</Text>
               </Block>
             </Block>
-          </Swipeout>
+          </Block>
         )}
         <Block flex={false} row right style={{ marginVertical: 10 }}>
           <Text h3 bold color={Colors.catalinaBlue}>{strings('Process.total')}: </Text>
@@ -488,6 +548,7 @@ class ProjectDetailScreen extends Component {
       }
     }
     totalCost += workerCost
+
     return (
       <Block flex={false}>
         <Block flex={false} style={styles.totalCostOfPhase}>
@@ -536,6 +597,65 @@ class ProjectDetailScreen extends Component {
       </Block>
     )
   }
+  renderEndproject = () => {
+    const { phases } = this.state.ProcessDetail
+    console.log('a', phases)
+    var dataTask = []
+    for (var i = 0; i < phases.length; i++) {
+      dataTask = dataTask.concat(phases[i].tasks)
+    }
+    var dataMaterials = []
+    for (var i = 0; i < dataTask.length; i++) {
+      dataMaterials = dataMaterials.concat(dataTask[i].materials)
+    }
+    var totalCost = 0;
+    var workerCost = 0
+    for (var i = 0; i < dataMaterials.length; i++) {
+      totalCost += dataMaterials[i].quantity * dataMaterials[i].unitPrice
+    }
+    for (var i = 0; i < dataTask.length; i++) {
+      if (dataTask[i].workerNum) {
+        workerCost += dataTask[i].workerNum * dataTask[i].workerUnitFee;
+      }
+    }
+    totalCost += workerCost
+    var totalCostActual = 0;
+    for (var i = 0; i < dataMaterials.length; i++) {
+      totalCostActual += dataMaterials[i].actualQuantity * dataMaterials[i].actualQuantity
+    }
+    totalCostActual += workerCost
+    return (
+      <Block flex={false} style={{ marginHorizontal: 10 }}>
+        <Block center flex={false}>
+          <Text h2 bold >Kế thúc dự án</Text>
+        </Block>
+
+        <Block flex={false} style={styles.totalCostOfPhase}>
+          <Text h3 bold color={Colors.white}>Tông chi phí dự toán:</Text>
+          <Block row flex={false}>
+            <TextCurrency h3 bold color={Colors.white} value={totalCost} />
+            <Text h3 bold color={Colors.white}> vnđ</Text>
+          </Block>
+        </Block>
+
+        <Block flex={false} style={styles.totalCostOfPhase}>
+          <Text h3 bold color={Colors.white}>Tông chi đầu tư:</Text>
+          <Block row flex={false}>
+            <TextCurrency h3 bold color={Colors.white} value={totalCostActual} />
+            <Text h3 bold color={Colors.white}> vnđ</Text>
+          </Block>
+        </Block>
+
+        <Block center flex={false} style={{ backgroundColor: Colors.green, paddingVertical: 20, marginTop: 50 }}>
+          <TouchableOpacity
+            onPress={() => this.handleEndProject()}
+          >
+            <Text h2 bold color={Colors.catalinaBlue}>Kết thúc</Text>
+          </TouchableOpacity>
+        </Block>
+      </Block>
+    )
+  }
   renderTask = (data, startPhase, endPhase) => {
     const { params } = this.props.navigation.state;
     const idProcess = params._id;
@@ -562,7 +682,7 @@ class ProjectDetailScreen extends Component {
         {data.map((item, index) =>
           <Block key={item._id} center flex={false} row style={{ marginBottom: 10 }} >
             <Block flex={false} style={styles.dot} />
-            <TouchableOpacity style={styles.task}
+            <TouchableOpacity style={[styles.task, item.isDailyTask === true ? { backgroundColor: "#7CFC00" } : { backgroundColor: "#E7F8FD" },]}
               onPress={() => navigation.navigate(Screens.TASK_PROJECT, { item, startTask: timeTask[index].start, endTask: timeTask[index].end, idProcess, sayHello: this.sayHelloHandle })}
             >
               <Text h3 bold color={Colors.catalinaBlue}>{item.name}</Text>
@@ -661,6 +781,12 @@ class ProjectDetailScreen extends Component {
             {this.renderStandard()}
           </Block>
         );
+      case 9:
+        return (
+          <Block flex={false} >
+            {this.renderEndproject()}
+          </Block>
+        );
       default:
         var data = {}
         if (phases) {
@@ -678,25 +804,56 @@ class ProjectDetailScreen extends Component {
     }
   }
   onRefresh = () => {
-		const {} = this.props;
-		this.handleFilterSortProcess();
-	};
+    const { } = this.props;
+    this.handleFilterSortProcess();
+  };
 
-	handleFilterSortProcess = () => {
+  handleFilterSortProcess = () => {
     const { params } = this.props.navigation.state;
     const idProcess = params._id;
     const { processActions } = this.props;
     processActions.fetchProcessDetail(idProcess);
-		this.setState({
-			isEditing: true,
-		});
-	};
+    this.setState({
+      isEditing: true,
+    });
+  };
+
+  handleEndProject = async () => {
+    const { params } = this.props.navigation.state;
+    const idProcess = params._id;
+    const { categoriesActions, navigation, cardsActions } = this.props;
+    const token = await getToken();
+    let { ProcessDetail } = this.state;
+    let dataUpdate = {
+      "_id": ProcessDetail._id,
+      "isFinished": true
+    }
+    // console.log('update', dataUpdate)
+    if (token) {
+      try {
+        cardsService.updateProjectEnd(dataUpdate, token)
+          .then(response => {
+            if (response) {
+              console.log('update done')
+              // processActions.fetchProcessDetail(idProcess);
+              categoriesActions.fetchProjectFinished();
+              cardsActions.fetchProject();
+              navigation.navigate(Screens.CATEGORIES);
+            } else {
+              console.log('err1')
+            }
+          });
+      } catch (error) {
+        console.log('err2')
+      }
+    }
+  }
   render() {
     const { navigation } = this.props;
     const diffClamp = Animated.diffClamp(this.state.scrollY, 0, 45)
     const { ProcessDetail, time, planStartDate, isOpen } = this.state
     const { phases } = ProcessDetail
-    const { isVisible,refreshing } = this.state;
+    const { isVisible, refreshing } = this.state;
 
     const dateTimePicker = ProcessDetail.planStartDate
     if (phases && phases.length !== 0) {
@@ -723,12 +880,12 @@ class ProjectDetailScreen extends Component {
             [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]
           )}
           refreshControl={
-							<RefreshControl
-								//refresh control used for the Pull to Refresh
-								refreshing={refreshing}
-								onRefresh={() => this.onRefresh()}
-							/>
-						}
+            <RefreshControl
+              //refresh control used for the Pull to Refresh
+              refreshing={refreshing}
+              onRefresh={() => this.onRefresh()}
+            />
+          }
         >
           <Block flex={false} style={styles.bar}>
             <Block column flex={false} style={{ paddingHorizontal: 5, paddingTop: 30, }}>
@@ -742,7 +899,7 @@ class ProjectDetailScreen extends Component {
           </Block>
           {/* render centent */}
           {this.renderContentprocess()}
-          <Block flex={false} style={styles.questions}>
+          {/* <Block flex={false} style={styles.questions}>
             <Block row center flex={false}>
               <Block center middle flex={false} style={{ height: 40, width: 40 }}>
                 <Image source={Images.iconQuestion} style={{ resizeMode: 'stretch', height: 27, width: 27 }}></Image>
@@ -750,7 +907,7 @@ class ProjectDetailScreen extends Component {
               <Text h2 color={"#26C165"}>{strings('Process.questions')}</Text>
             </Block>
             {this.renderQuestions()}
-          </Block>
+          </Block> */}
         </ScrollView>
         {isVisible && (
           <DateTimePickerModal
@@ -793,5 +950,7 @@ const mapStateToprop = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   processActions: bindActionCreators(ProcessActions, dispatch),
+  categoriesActions: bindActionCreators(CategoriesActions, dispatch),
+  cardsActions: bindActionCreators(CardsActions, dispatch),
 })
 export default connect(mapStateToprop, mapDispatchToProps)(ProjectDetailScreen);

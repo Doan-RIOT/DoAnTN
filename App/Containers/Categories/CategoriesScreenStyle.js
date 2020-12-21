@@ -68,7 +68,7 @@ export default StyleSheet.create({
   },
   statistical: {
     paddingHorizontal:10,
-    marginTop: 80,
+    marginTop: 70,
   },
   header: {
     backgroundColor: "#0A9F9E",

@@ -51,7 +51,7 @@ export default StyleSheet.create({
   timePlan: {
     marginTop: 10,
     paddingHorizontal:10,
-    height: height / 13,
+    height: height / 12,
     borderColor: "#2AD16E",
     borderWidth: 1,
     alignSelf: "center"
@@ -61,7 +61,7 @@ export default StyleSheet.create({
   },
   statistical: {
     paddingHorizontal:5,
-    marginTop: 80,
+    marginTop:30,
   },
   header: {
     backgroundColor: "#0A9F9E",

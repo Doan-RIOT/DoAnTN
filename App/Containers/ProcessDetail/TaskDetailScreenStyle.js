@@ -16,7 +16,6 @@ export default StyleSheet.create({
         width: null,
     },
     ItemEstimatesPhase: {
-        flexDirection: "row",
         backgroundColor: "#E7F8FD",
         borderRadius: 10,
         paddingVertical: 20,

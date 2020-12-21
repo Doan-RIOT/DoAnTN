@@ -52,17 +52,17 @@ class ProfileScreen extends Component {
       token
     })
   };
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    const {profile}=this.props
-    if(nextProps.profile!==profile){
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { profile } = this.props
+    if (nextProps.profile !== profile) {
       this.setState({
-        profile:nextProps.profile,
-        isSigningIn:true
+        profile: nextProps.profile,
+        isSigningIn: true
       })
-    }else{
+    } else {
       this.setState({
         profile: profile,
-        isSigningIn:true
+        isSigningIn: true
       })
     }
   }
@@ -71,9 +71,8 @@ class ProfileScreen extends Component {
     const { local } = this.state.profile;
     const { navigation, userId } = this.props;
     const { token } = this.state;
-    const imageUrl = `${Config.IMAGE_URL}?uploadId=${
-      profile.avatar ? profile.avatar : ""
-    }&seq=1`;
+    const imageUrl = `${Config.IMAGE_URL}?uploadId=${profile.avatar ? profile.avatar : ""
+      }&seq=1`;
     return (
       <ImageBackground
         source={{ uri: "https://images.unsplash.com/photo-1569239591652-6cc3025b07fa?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" }}
@@ -83,7 +82,7 @@ class ProfileScreen extends Component {
         <TouchableOpacity
           style={{ alignItems: "center" }}
           onPress={() => this.handleNavigateUserInfo()}
-          // disabled={!token || (token && token === "")}
+        // disabled={!token || (token && token === "")}
         >
           <Block flex={false} center style={Style.container}>
             <Block center middle flex={false} style={{ marginLeft: 10 }}>
@@ -105,9 +104,8 @@ class ProfileScreen extends Component {
                           bold
                           style={{}}
                         >
-                          {`${
-                            profile && profile.fullName ? profile.fullName : ""
-                          }`}
+                          {`${profile && profile.fullName ? profile.fullName : ""
+                            }`}
                         </Text>
                       </Block>
                       {profile && profile.local?.email ? (
@@ -159,30 +157,30 @@ class ProfileScreen extends Component {
                       ) : null}
                     </>
                   ) : (
-                    <Text>{strings("Profile.msgUpdateProfile")}</Text>
-                  )}
+                      <Text>{strings("Profile.msgUpdateProfile")}</Text>
+                    )}
                 </Block>
               ) : (
-                <Block flex={false} style={Style.logInOut} row center>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate(Screens.LOGIN)}
-                  >
-                    <Text green h3>
-                      {strings("Login.login")}
-                    </Text>
-                  </TouchableOpacity>
-                  <Text h3 green>
-                    /
+                  <Block flex={false} style={Style.logInOut} row center>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate(Screens.LOGIN)}
+                    >
+                      <Text green h3>
+                        {strings("Login.login")}
+                      </Text>
+                    </TouchableOpacity>
+                    <Text h3 green>
+                      /
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate(Screens.SIGNUP)}
-                  >
-                    <Text green h3>
-                      {strings("Login.signUp")}
-                    </Text>
-                  </TouchableOpacity>
-                </Block>
-              )}
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate(Screens.SIGNUP)}
+                    >
+                      <Text green h3>
+                        {strings("Login.signUp")}
+                      </Text>
+                    </TouchableOpacity>
+                  </Block>
+                )}
             </Block>
           </Block>
           <Image
